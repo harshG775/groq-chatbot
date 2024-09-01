@@ -13,8 +13,13 @@ import {
     ThumbsUp,
     User,
 } from "lucide-react";
+import {
+    ChatCompletionResponse,
+    getGroqChatCompletion,
+} from "@/services/groq/getGroqChatCompletion";
 
 export default function ChatPage() {
+    const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([
         { role: "assistant", content: "Hello! How can I assist you today?" },
         { role: "user", content: "Can you explain what React hooks are?" },
@@ -26,15 +31,38 @@ export default function ChatPage() {
     ]);
     const [input, setInput] = useState("");
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (input.trim()) {
-            setMessages([...messages, { role: "user", content: input }]);
-            setInput("");
+            setMessages((preMessage) => [
+                ...preMessage,
+                { role: "user", content: input },
+            ]);
             // Here you would typically send the message to your AI backend
             // and then add the response to the messages
+
+            try {
+                setLoading(true);
+                const chatCompletion: ChatCompletionResponse =
+                    await getGroqChatCompletion({
+                        content: input,
+                    });
+                console.log(chatCompletion);
+                // Print the completion returned by the LLM.
+                setMessages((preMessage) => [
+                    ...preMessage,
+                    {
+                        role: chatCompletion.choices[0].message.role,
+                        content: chatCompletion.choices[0]?.message?.content,
+                    },
+                ]);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setInput("");
+                setLoading(false);
+            }
         }
     };
-
     return (
         <>
             <ScrollArea className="flex-1 p-4">
@@ -115,13 +143,17 @@ export default function ChatPage() {
             <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center">
                     <Input
+                        disabled={loading}
                         placeholder="Type your message here..."
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handleSend()}
                         className="flex-1 mr-2"
                     />
-                    <Button onClick={handleSend} disabled={!input.trim()}>
+                    <Button
+                        onClick={handleSend}
+                        disabled={!input.trim() || loading}
+                    >
                         <ArrowUp className="h-4 w-4" />
                     </Button>
                 </div>
