@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,14 @@ import {
 } from "@/services/groq/getGroqChatCompletion";
 
 export default function ChatPage() {
+    const myDivRef = useRef(null);
+
+    const handleScrollToDiv = () => {
+        if (myDivRef.current) {
+            myDivRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    };
+
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([
         { role: "assistant", content: "Hello! How can I assist you today?" },
@@ -63,6 +71,9 @@ export default function ChatPage() {
             }
         }
     };
+    useEffect(()=>{
+        handleScrollToDiv()
+    },[messages])
     return (
         <>
             <ScrollArea className="flex-1 p-4">
@@ -138,6 +149,7 @@ export default function ChatPage() {
                             </Card>
                         </div>
                     ))}
+                    <div ref={myDivRef}/>
                 </div>
             </ScrollArea>
             <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
