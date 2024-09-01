@@ -1,13 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Providers from "./components/providers/Providers";
+
 import HomePage from "./pages/page";
 import RootLayout from "./pages/layout";
 import ErrorPage from "./pages/error";
 import Loading from "./pages/loading";
 import NotFound from "./pages/not-found";
 import ChatPage from "./pages/chat/page";
-
-// 
-import Providers from "./components/providers/Providers";
+import ChatLayout from "./pages/chat/layout";
 
 const router = createBrowserRouter([
     {
@@ -17,12 +17,18 @@ const router = createBrowserRouter([
         element: <RootLayout />,
         children: [
             {
-                path: "/",
+                index: true,
                 element: <HomePage />,
             },
             {
                 path: "/chat",
-                element: <ChatPage />,
+                element: <ChatLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <ChatPage />,
+                    },
+                ],
             },
         ],
     },
