@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,10 +13,7 @@ import {
     ThumbsUp,
     User,
 } from "lucide-react";
-import {
-    ChatCompletionResponse,
-    getGroqChatCompletion,
-} from "@/services/groq/getGroqChatCompletion";
+import { getGroqChatCompletion } from "@/services/groq/getGroqChatCompletion";
 
 export default function ChatPage() {
     const myDivRef = useRef<null | HTMLDivElement>(null);
