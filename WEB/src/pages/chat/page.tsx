@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +19,7 @@ import {
 } from "@/services/groq/getGroqChatCompletion";
 
 export default function ChatPage() {
-    const myDivRef = useRef(null);
+    const myDivRef = useRef<null | HTMLDivElement>(null);
 
     const handleScrollToDiv = () => {
         if (myDivRef.current) {
@@ -30,12 +30,6 @@ export default function ChatPage() {
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([
         { role: "assistant", content: "Hello! How can I assist you today?" },
-        { role: "user", content: "Can you explain what React hooks are?" },
-        {
-            role: "assistant",
-            content:
-                "React hooks are functions that allow you to use state and other React features in functional components. They were introduced in React 16.8 to enable developers to use state and lifecycle methods in functional components, which previously was only possible in class components. Some commonly used hooks include:...",
-        },
     ]);
     const [input, setInput] = useState("");
 
@@ -50,17 +44,17 @@ export default function ChatPage() {
 
             try {
                 setLoading(true);
-                const chatCompletion: ChatCompletionResponse =
-                    await getGroqChatCompletion({
-                        content: input,
-                    });
-                console.log(chatCompletion);
+                const { choices } = await getGroqChatCompletion({
+                    content: input,
+                });
                 // Print the completion returned by the LLM.
                 setMessages((preMessage) => [
                     ...preMessage,
                     {
-                        role: chatCompletion.choices[0].message.role,
-                        content: chatCompletion.choices[0]?.message?.content,
+                        role: choices[0].message.content || "assistant",
+                        content:
+                            choices[0].message.content ||
+                            "something went wrong",
                     },
                 ]);
             } catch (error) {
@@ -71,9 +65,9 @@ export default function ChatPage() {
             }
         }
     };
-    useEffect(()=>{
-        handleScrollToDiv()
-    },[messages])
+    useEffect(() => {
+        handleScrollToDiv();
+    }, [messages]);
     return (
         <>
             <ScrollArea className="flex-1 p-4">
@@ -149,7 +143,7 @@ export default function ChatPage() {
                             </Card>
                         </div>
                     ))}
-                    <div ref={myDivRef}/>
+                    <div ref={myDivRef} />
                 </div>
             </ScrollArea>
             <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">

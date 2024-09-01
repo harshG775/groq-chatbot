@@ -47,7 +47,7 @@ export type ChatCompletionResponse = {
     choices: Choice[];
     system_fingerprint: string;
     usage: Usage;
-    x_groq: {
+    x_groq?: {
         id: string;
     };
 };
