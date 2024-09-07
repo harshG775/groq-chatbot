@@ -16,9 +16,10 @@ export const useMessagesStore = create<MessagesStoreType>((set) => ({
     messages: [
         { role: "assistant", content: "Hello! How can I assist you today?" },
     ],
-    addMessage: (newMessage) =>
+    addMessage: (newMessage) => {
         set((state) => ({
             messages: [...state.messages, newMessage],
-        })),
+        }));
+    },
     clearMessages: () => set({ messages: [] }),
 }));

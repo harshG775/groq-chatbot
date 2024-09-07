@@ -14,7 +14,7 @@ const InputValueSchema = z.object({
 
 type SignUpSchemaType = z.infer<typeof InputValueSchema>;
 export default function InputBar({ className }: { className?: string }) {
-    const { addMessage } = useMessagesStore();
+    const { messages, addMessage } = useMessagesStore();
     const { register, handleSubmit, reset } = useForm<SignUpSchemaType>({
         resolver: zodResolver(InputValueSchema),
     });
@@ -25,6 +25,7 @@ export default function InputBar({ className }: { className?: string }) {
         });
         const { choices } = await groq.chat.completions.create({
             messages: [
+                ...messages,
                 {
                     role: "user",
                     content: data.inputValue,
@@ -33,6 +34,10 @@ export default function InputBar({ className }: { className?: string }) {
             // model: "mixtral-8x7b-32768",
             model: "llama3-8b-8192",
         });
+
+        // text streaming
+
+        //
         addMessage({
             role: choices[0]?.message?.role || "assistant",
             content: choices[0]?.message?.content || "something went wrong",
