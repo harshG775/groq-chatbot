@@ -1,6 +1,5 @@
 import useTypewriter from "@/hooks/useTypeWriter";
 import Markdown from "@/lib/ReactMarkdown";
-import { useMessagesStore } from "@/store/zustand/chat/messages.store";
 import { BotIcon, User } from "lucide-react";
 
 export type message = {
@@ -36,8 +35,7 @@ export function Chat({ message }: ChatProps) {
     );
 }
 export function StreamChat({ message }: ChatProps) {
-    const { stop, setStop } = useMessagesStore();
-    const displayText = useTypewriter(message.content, 50, stop,setStop);
+    const displayText = useTypewriter(message.content, 20, false);
     return (
         <div
             className={`border rounded-lg p-2 ${

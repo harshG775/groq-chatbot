@@ -2,8 +2,11 @@
 import { useEffect, useRef } from "react";
 import { Chat, StreamChat } from "./Chat";
 import { useMessagesStore } from "@/store/zustand/chat/messages.store";
+import { useStreamMessage } from "@/store/zustand/chat/streamMessage.store";
 export default function ChatArea() {
     const { messages } = useMessagesStore();
+    const streamMessage = useStreamMessage((state) => state.streamMessage);
+
     const scrollToViewRef = useRef<null | HTMLDivElement>(null);
 
     const handleScrollToDiv = () => {
@@ -13,11 +16,11 @@ export default function ChatArea() {
     };
     useEffect(() => {
         // Using a timeout to ensure the DOM is updated before scrolling
-        const timeoutId = setTimeout(() => {
+        // const timeoutId = setTimeout(() => {
             handleScrollToDiv();
-        }, 100); // Short delay to ensure messages are rendered
+        // }, 100); // Short delay to ensure messages are rendered
 
-        return () => clearTimeout(timeoutId); // Cleanup timeout
+        // return () => clearTimeout(timeoutId); // Cleanup timeout
     }, [messages]);
     const arrayLastMessage = messages.at(-1);
     return (
@@ -30,8 +33,13 @@ export default function ChatArea() {
                             ?.map((message, i) => {
                                 return <Chat key={i} message={message} />;
                             })}
-                        {arrayLastMessage.role === "assistant" && (
-                            <StreamChat message={arrayLastMessage} />
+                        {streamMessage && (
+                            <Chat
+                                message={{
+                                    role: "assistant",
+                                    content: streamMessage,
+                                }}
+                            />
                         )}
                         <div ref={scrollToViewRef} />
                     </div>

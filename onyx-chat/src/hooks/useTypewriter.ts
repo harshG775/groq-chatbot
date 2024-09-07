@@ -4,7 +4,6 @@ export default function useTypewriter(
     text = "",
     speed = 50,
     stop = false,
-    setStop: any
 ) {
     const [displayText, setDisplayText] = useState("");
     const index = useRef(0);
@@ -14,12 +13,11 @@ export default function useTypewriter(
 
         const typingInterval = setInterval(() => {
             if (index.current < text.length) {
-                setDisplayText(
-                    (prevText) => prevText + text.charAt(index.current)
-                );
+                setDisplayText((prevText) => {
+                    return prevText + text.charAt(index.current);
+                });
                 index.current++;
             } else {
-                console.log("stoped here")
                 clearInterval(typingInterval);
             }
         }, speed);
