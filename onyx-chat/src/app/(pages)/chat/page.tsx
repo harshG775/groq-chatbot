@@ -1,3 +1,4 @@
+import ChatArea from "@/components/partials/chatArea/ChatArea";
 import InputBar from "@/components/partials/inputbar/InputBar";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,19 +34,7 @@ export default function ChatPage() {
             </aside>
             <div className="rounded-md border p-2 mt-2">header</div>
             <ScrollArea className="w-full rounded-md border p-4">
-                <main className="grid gap-5 container p-0">
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                    <div className="bg-gray-500 h-40"></div>
-                </main>
+                <ChatArea/>
             </ScrollArea>
             <InputBar className="rounded-md border p-2 mb-2" />
         </div>
