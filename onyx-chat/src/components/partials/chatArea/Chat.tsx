@@ -1,3 +1,4 @@
+import Markdown from "@/lib/ReactMarkdown";
 import { BotIcon, User } from "lucide-react";
 
 export type message = {
@@ -11,7 +12,9 @@ export default function Chat({ message }: ChatProps) {
     return (
         <div
             className={`border rounded-lg p-2 ${
-                message.role === "user" ? "max-w-[80%] justify-self-end" : "max-w-full"
+                message.role === "user"
+                    ? "max-w-[80%] self-end"
+                    : "max-w-full"
             }`}
         >
             {message.role === "assistant" && (
@@ -26,7 +29,9 @@ export default function Chat({ message }: ChatProps) {
                     <span className="block">H</span>
                 </div>
             )}
-            <div className="p-4">{message.content}</div>
+            <div className="p-4">
+                <Markdown>{message.content}</Markdown>
+            </div>
         </div>
     );
 }
