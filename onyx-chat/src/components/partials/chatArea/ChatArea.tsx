@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
-import Chat from "./Chat";
+import { Chat, StreamChat } from "./Chat";
 import { useMessagesStore } from "@/store/zustand/chat/messages.store";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
 export default function ChatArea() {
     const { messages } = useMessagesStore();
     const scrollToViewRef = useRef<null | HTMLDivElement>(null);
@@ -21,18 +19,27 @@ export default function ChatArea() {
 
         return () => clearTimeout(timeoutId); // Cleanup timeout
     }, [messages]);
+    const arrayLastMessage = messages.at(-1);
     return (
         <div className="w-full rounded-md border p-4 overflow-y-auto">
             <main className="container">
-                <div className="flex flex-col gap-10 ">
-                    {messages?.map((message, i) => (
-                        <Chat key={i} message={message} />
-                    ))}
-                    {/* {newMessage &&
-                    <div></div>
-                } */}
-                    <div ref={scrollToViewRef} />
-                </div>
+                {arrayLastMessage ? (
+                    <div className="flex flex-col gap-10 ">
+                        {messages
+                            ?.slice(0, messages.length - 1)
+                            ?.map((message, i) => {
+                                return <Chat key={i} message={message} />;
+                            })}
+                        {arrayLastMessage.role === "assistant" && (
+                            <StreamChat message={arrayLastMessage} />
+                        )}
+                        <div ref={scrollToViewRef} />
+                    </div>
+                ) : (
+                    <div className="grid place-content-center font-bold">
+                        <h1>Welcome</h1>
+                    </div>
+                )}
             </main>
         </div>
     );

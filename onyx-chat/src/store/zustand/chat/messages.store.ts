@@ -10,11 +10,17 @@ type MessagesStoreType = {
     // eslint-disable-next-line no-unused-vars
     addMessage: (newMessage: message) => void;
     clearMessages: () => void;
+
+    stop: boolean;
+    setStop: (value: boolean) => void;
 };
 
 export const useMessagesStore = create<MessagesStoreType>((set) => ({
     messages: [
-        { role: "assistant", content: "Hello! How can I assist you today?" },
+        // {
+        //     role: "assistant",
+        //     content: "Hello! How can I assist you today?",
+        // },
     ],
     addMessage: (newMessage) => {
         set((state) => ({
@@ -22,4 +28,7 @@ export const useMessagesStore = create<MessagesStoreType>((set) => ({
         }));
     },
     clearMessages: () => set({ messages: [] }),
+
+    stop: false,
+    setStop: (value) => set({ stop: value }),
 }));

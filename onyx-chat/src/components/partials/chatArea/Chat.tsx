@@ -1,4 +1,6 @@
+import useTypewriter from "@/hooks/useTypeWriter";
 import Markdown from "@/lib/ReactMarkdown";
+import { useMessagesStore } from "@/store/zustand/chat/messages.store";
 import { BotIcon, User } from "lucide-react";
 
 export type message = {
@@ -8,13 +10,11 @@ export type message = {
 type ChatProps = {
     message: message;
 };
-export default function Chat({ message }: ChatProps) {
+export function Chat({ message }: ChatProps) {
     return (
         <div
             className={`border rounded-lg p-2 ${
-                message.role === "user"
-                    ? "max-w-[80%] self-end"
-                    : "max-w-full"
+                message.role === "user" ? "max-w-[80%] self-end" : "max-w-full"
             }`}
         >
             {message.role === "assistant" && (
@@ -31,6 +31,33 @@ export default function Chat({ message }: ChatProps) {
             )}
             <div className="p-4">
                 <Markdown>{message.content}</Markdown>
+            </div>
+        </div>
+    );
+}
+export function StreamChat({ message }: ChatProps) {
+    const { stop, setStop } = useMessagesStore();
+    const displayText = useTypewriter(message.content, 50, stop,setStop);
+    return (
+        <div
+            className={`border rounded-lg p-2 ${
+                message.role === "user" ? "max-w-[80%] self-end" : "max-w-full"
+            }`}
+        >
+            {message.role === "assistant" && (
+                <div className="flex items-end gap-2 p-2 text-sm">
+                    <BotIcon />
+                    <span className="block">assistant</span>
+                </div>
+            )}
+            {message.role === "user" && (
+                <div className="flex items-end gap-2 p-2 text-sm justify-end">
+                    <User />
+                    <span className="block">H</span>
+                </div>
+            )}
+            <div className="p-4">
+                <Markdown>{displayText}</Markdown>
             </div>
         </div>
     );
