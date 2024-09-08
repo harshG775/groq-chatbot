@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { Chat, StreamChat } from "./Chat";
 import { useMessagesStore } from "@/store/zustand/chat/messages.store";
 import { useCurrentMessage } from "@/store/zustand/chat/useCurrentMessage.store";
+import { Bot } from "lucide-react";
 export default function ChatArea() {
     const { messages } = useMessagesStore();
     const currentMessage = useCurrentMessage((state) => state.currentMessage);
@@ -49,8 +50,11 @@ export default function ChatArea() {
                         <div ref={scrollToViewRef} />
                     </div>
                 ) : (
-                    <div className="grid place-content-center font-bold">
-                        <h1>Welcome</h1>
+                    <div className="grid place-content-center min-h-96 font-bold text-2xl">
+                        <div className="grid place-content-center">
+                            <Bot height={100} width={100} />
+                        </div>
+                        <h1 className="uppercase">Welcome</h1>
                     </div>
                 )}
             </main>
