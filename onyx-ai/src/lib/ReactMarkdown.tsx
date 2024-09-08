@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { ReactElement, useMemo } from "react";
 
 import ReactMarkdown from "react-markdown";
 //remark-gfm for symbels table checkbox etc.
@@ -10,6 +10,7 @@ import "katex/dist/katex.min.css";
 
 type MarkdownProps = {
     children: string | null | undefined;
+    className?: string;
 };
 export default function Markdown({ children, ...props }: MarkdownProps) {
     const components = useMemo(
