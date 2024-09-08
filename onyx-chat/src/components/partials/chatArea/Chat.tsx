@@ -1,4 +1,4 @@
-import useTypewriter from "@/hooks/useTypeWriter";
+import useTypewriter from "@/hooks/useTypewriter";
 import Markdown from "@/lib/ReactMarkdown";
 import { BotIcon, User } from "lucide-react";
 
@@ -35,7 +35,7 @@ export function Chat({ message }: ChatProps) {
     );
 }
 export function StreamChat({ message }: ChatProps) {
-    const displayText = useTypewriter(message.content, 20, false);
+    const displayText = useTypewriter(message.content, 10, false);
     return (
         <div
             className={`border rounded-lg p-2 ${
