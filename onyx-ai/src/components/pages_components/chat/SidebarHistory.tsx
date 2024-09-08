@@ -84,7 +84,7 @@ export default function SidebarHistory() {
                             {editingId === item.id ? (
                                 <Button
                                     size="icon"
-                                    variant={"outline"}
+                                    variant={"ghost"}
                                     className="w-8 h-8 rounded-full"
                                     onClick={() => handleSaveEdit(item.id)}
                                 >
@@ -93,7 +93,7 @@ export default function SidebarHistory() {
                             ) : (
                                 <Button
                                     size="icon"
-                                    variant={"outline"}
+                                    variant={"ghost"}
                                     className="w-8 h-8 rounded-full"
                                     onClick={() =>
                                         handleEdit(item.id, item.text)
@@ -104,8 +104,8 @@ export default function SidebarHistory() {
                             )}
                             <Button
                                 size="icon"
-                                variant="destructive"
-                                className="w-8 h-8 rounded-full"
+                                variant="ghost"
+                                className="w-8 h-8 rounded-full hover:text-destructive"
                                 onClick={() => handleDelete(item.id)}
                             >
                                 <Trash2 className="h-3 w-3" />
