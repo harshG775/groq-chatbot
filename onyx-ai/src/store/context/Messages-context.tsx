@@ -37,15 +37,7 @@ type MessagesProviderProps = {
 };
 
 export function MessagesProvider({ children }: MessagesProviderProps) {
-    const [messages, setMessages] = useState<message[]>([
-        { role: "assistant", content: "Hello! How can I help you today?" },
-        { role: "user", content: "Hi there! I have a question about React." },
-        {
-            role: "assistant",
-            content:
-                "Sure, I'd be happy to help with any React-related questions. What would you like to know?",
-        },
-    ]);
+    const [messages, setMessages] = useState<message[]>([]);
     return (
         <MessagesContext.Provider value={{ messages, setMessages }}>
             {children}

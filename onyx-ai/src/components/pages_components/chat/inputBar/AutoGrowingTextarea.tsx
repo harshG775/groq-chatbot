@@ -47,6 +47,8 @@ export default function AutoGrowingTextarea() {
         }
     };
 
+
+    // handling sending user text input to ai api
     const [loading, setLoading] = useState(false);
     const { messages, setMessages } = useMessagesContext();
     const handleSubmit = async () => {
@@ -81,6 +83,11 @@ export default function AutoGrowingTextarea() {
                 // stream: true,
             });
             setLoading(false);
+            // current chat after complete typing 
+            // effect change typing to false 
+            // set current chat to messages
+            
+            // 
             setMessages((pre) => [
                 ...pre,
                 {
