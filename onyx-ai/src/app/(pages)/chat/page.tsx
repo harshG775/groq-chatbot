@@ -8,7 +8,7 @@ import InputBar from "@/components/pages_components/chat/inputBar/InputBar";
 
 export default function ChatPage() {
     return (
-        <div className="fixed inset-0 h-screen grid md:grid-cols-[16rem_auto] grid-rows-[auto_1fr_auto] gap-2 px-2 bg-secondary/50">
+        <div className="fixed inset-0 h-svh grid md:grid-cols-[16rem_auto] grid-rows-[auto_1fr_auto] gap-2 px-2 bg-secondary/50">
             <SidebarHistory />
             <div className="rounded-md border p-2 mt-2 flex gap-2 ">
                 <div className="p-2">Header</div>
