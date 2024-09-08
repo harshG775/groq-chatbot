@@ -1,7 +1,10 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { groq } from "@/services/groq.ai";
+import { useMessagesContext } from "@/store/context/Messages-context";
+import { CircleArrowUp } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-interface AutoGrowingTextareaProps {}
-export default function AutoGrowingTextarea({}: AutoGrowingTextareaProps) {
+export default function AutoGrowingTextarea() {
     const [userInput, setUserInput] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,24 +47,78 @@ export default function AutoGrowingTextarea({}: AutoGrowingTextareaProps) {
         }
     };
 
-    const handleSubmit = () => {
-        console.log("Submitted Message: ");
-        console.log(userInput);
+    const [loading, setLoading] = useState(false);
+    const { messages, setMessages } = useMessagesContext();
+    const handleSubmit = async () => {
+        if (loading) {
+            return;
+        }
+        setMessages((pre) => [
+            ...pre,
+            {
+                role: "user",
+                content: userInput,
+            },
+        ]);
         setUserInput("");
 
+        // api request to ai api
+        try {
+            setLoading(true);
+            const { choices } = await groq.chat.completions.create({
+                messages: [
+                    ...messages,
+                    {
+                        role: "user",
+                        content: userInput,
+                    },
+                ],
+                // model: "mixtral-8x7b-32768",
+                model: "llama3-8b-8192",
+                temperature: 0.5,
+                max_tokens: 1024,
+                stop: null,
+                // stream: true,
+            });
+            setLoading(false);
+            setMessages((pre) => [
+                ...pre,
+                {
+                    role: choices[0]?.message?.role || "",
+                    content: choices[0]?.message?.content || "",
+                },
+            ]);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+        //
     };
 
     return (
-        <textarea
-            ref={textareaRef}
-            value={userInput}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder={"Type your message here..."}
-            className={`min-h-10 max-h-52 p-2 m-0 resize-none border-0 bg-transparent text-token-text-primary focus:ring-0 focus-visible:ring-0 w-full  overflow-y-auto transition-height duration-300 `}
-            tabIndex={0}
-            rows={1}
-            dir={"auto"}
-        />
+        <form className="flex justify-between items-center">
+            <textarea
+                ref={textareaRef}
+                value={userInput}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                placeholder={"Type your message here..."}
+                className={`min-h-10 max-h-52 p-2 m-0 resize-none border-0 bg-transparent text-token-text-primary focus:ring-0 focus-visible:ring-0 w-full  overflow-y-auto transition-height duration-300 `}
+                tabIndex={0}
+                rows={1}
+                dir={"auto"}
+            />
+            <div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    type="submit"
+                    disabled={loading}
+                >
+                    <CircleArrowUp />
+                </Button>
+            </div>
+        </form>
     );
 }

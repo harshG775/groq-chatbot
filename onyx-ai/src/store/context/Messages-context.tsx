@@ -45,18 +45,6 @@ export function MessagesProvider({ children }: MessagesProviderProps) {
             content:
                 "Sure, I'd be happy to help with any React-related questions. What would you like to know?",
         },
-        { role: "user", content: "Hi there! I have a question about React." },
-
-        { role: "assistant", content: "Hello! How can I help you today?" },
-        { role: "user", content: "Hi there! I have a question about React." },
-        { role: "assistant", content: "Hello! How can I help you today?" },
-        { role: "user", content: "Hi there! I have a question about React." },
-        { role: "assistant", content: "Hello! How can I help you today?" },
-        { role: "user", content: "Hi there! I have a question about React." },
-        { role: "assistant", content: "Hello! How can I help you today?" },
-        { role: "user", content: "Hi there! I have a question about React." },
-        { role: "assistant", content: "Hello! How can I help you today?" },
-        { role: "user", content: "Hi there! I have a question about React." },
     ]);
     return (
         <MessagesContext.Provider value={{ messages, setMessages }}>
