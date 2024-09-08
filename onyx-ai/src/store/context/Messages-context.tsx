@@ -14,7 +14,7 @@ export type message = {
 
 type MessagesContextType = {
     messages: message[];
-    setMessage: Dispatch<SetStateAction<message[]>>;
+    setMessages: Dispatch<SetStateAction<message[]>>;
 };
 
 // Create the context with a default value
@@ -37,9 +37,29 @@ type MessagesProviderProps = {
 };
 
 export function MessagesProvider({ children }: MessagesProviderProps) {
-    const [messages, setMessage] = useState<message[]>([]);
+    const [messages, setMessages] = useState<message[]>([
+        { role: "assistant", content: "Hello! How can I help you today?" },
+        { role: "user", content: "Hi there! I have a question about React." },
+        {
+            role: "assistant",
+            content:
+                "Sure, I'd be happy to help with any React-related questions. What would you like to know?",
+        },
+        { role: "user", content: "Hi there! I have a question about React." },
+
+        { role: "assistant", content: "Hello! How can I help you today?" },
+        { role: "user", content: "Hi there! I have a question about React." },
+        { role: "assistant", content: "Hello! How can I help you today?" },
+        { role: "user", content: "Hi there! I have a question about React." },
+        { role: "assistant", content: "Hello! How can I help you today?" },
+        { role: "user", content: "Hi there! I have a question about React." },
+        { role: "assistant", content: "Hello! How can I help you today?" },
+        { role: "user", content: "Hi there! I have a question about React." },
+        { role: "assistant", content: "Hello! How can I help you today?" },
+        { role: "user", content: "Hi there! I have a question about React." },
+    ]);
     return (
-        <MessagesContext.Provider value={{ messages, setMessage }}>
+        <MessagesContext.Provider value={{ messages, setMessages }}>
             {children}
         </MessagesContext.Provider>
     );
