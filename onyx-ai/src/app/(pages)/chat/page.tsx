@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { CircleArrowUp } from "lucide-react";
 import ChatArea from "@/components/pages_components/chat/ChatArea";
 import SidebarHistory from "@/components/pages_components/chat/SidebarHistory";
+import InputBar from "@/components/pages_components/chat/inputBar/InputBar";
 
 export default function ChatPage() {
     return (
@@ -23,22 +23,7 @@ export default function ChatPage() {
             </div>
 
             <ChatArea />
-            <div className="rounded-md border p-2 mb-2">
-                <form className="flex justify-between items-center">
-                    <div>input</div>
-                    <div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            type="submit"
-                            disabled={false}
-                        >
-                            <CircleArrowUp />
-                        </Button>
-                    </div>
-                </form>
-            </div>
+            <InputBar/>
         </div>
     );
 }
