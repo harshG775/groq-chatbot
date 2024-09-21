@@ -4,6 +4,7 @@ import { getGroqChatCompletion } from "@/services/groq/groq";
 import { useMessagesContext } from "@/store/context/Messages-context";
 import { useStreamMessageContext } from "@/store/context/StreamMessage-context";
 import { useUserInputContext } from "@/store/context/UserInput-context";
+import { delay } from "@/utils/delay";
 import { ArrowUp, Square } from "lucide-react";
 import { FormEvent, useCallback } from "react";
 
@@ -30,6 +31,7 @@ export default function InputBar() {
                 let accumulated = "";
                 setStreaming(true);
                 for await (const { choices } of stream) {
+                    await delay(4)
                     const choiceContent = choices[0]?.delta?.content || "";
                     accumulated += choiceContent;
 
