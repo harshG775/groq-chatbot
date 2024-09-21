@@ -6,3 +6,6 @@ export const groq = new Groq({
     dangerouslyAllowBrowser: true,
     apiKey: "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",
 });
+export const getModels = async () => {
+    return await groq.models.list();
+};

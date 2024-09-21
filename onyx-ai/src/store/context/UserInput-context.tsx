@@ -1,12 +1,5 @@
 "use client";
-import React, {
-    createContext,
-    useContext,
-    useState,
-    ReactNode,
-    Dispatch,
-    SetStateAction,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
 type UserInputContextType = {
     userInput: string;
     setUserInput: Dispatch<SetStateAction<string>>;
@@ -19,9 +12,7 @@ const UserInputContext = createContext<UserInputContextType | null>(null);
 export const useUserInputContext = (): UserInputContextType => {
     const context = useContext(UserInputContext);
     if (!context) {
-        throw new Error(
-            "useUserInputContext must be used within a UserInputProvider"
-        );
+        throw new Error("useUserInputContext must be used within a UserInputProvider");
     }
     return context;
 };
@@ -33,9 +24,5 @@ type MessagesProviderProps = {
 
 export function UserInputProvider({ children }: MessagesProviderProps) {
     const [userInput, setUserInput] = useState<string>("");
-    return (
-        <UserInputContext.Provider value={{ userInput, setUserInput }}>
-            {children}
-        </UserInputContext.Provider>
-    );
+    return <UserInputContext.Provider value={{ userInput, setUserInput }}>{children}</UserInputContext.Provider>;
 }

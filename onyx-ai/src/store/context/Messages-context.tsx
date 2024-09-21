@@ -1,20 +1,10 @@
 "use client";
-import React, {
-    createContext,
-    useContext,
-    useState,
-    ReactNode,
-    Dispatch,
-    SetStateAction,
-} from "react";
-export type message = {
-    role: "user" | "assistant" | "system";
-    content: string;
-};
+import { Message } from "@/types/messages/message";
+import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
 
 type MessagesContextType = {
-    messages: message[];
-    setMessages: Dispatch<SetStateAction<message[]>>;
+    messages: Message[];
+    setMessages: Dispatch<SetStateAction<Message[]>>;
 };
 
 // Create the context with a default value
@@ -24,9 +14,7 @@ const MessagesContext = createContext<MessagesContextType | null>(null);
 export const useMessagesContext = (): MessagesContextType => {
     const context = useContext(MessagesContext);
     if (!context) {
-        throw new Error(
-            "useMessagesContext must be used within a MessagesProvider"
-        );
+        throw new Error("useMessagesContext must be used within a MessagesProvider");
     }
     return context;
 };
@@ -37,10 +25,6 @@ type MessagesProviderProps = {
 };
 
 export function MessagesProvider({ children }: MessagesProviderProps) {
-    const [messages, setMessages] = useState<message[]>([]);
-    return (
-        <MessagesContext.Provider value={{ messages, setMessages }}>
-            {children}
-        </MessagesContext.Provider>
-    );
+    const [messages, setMessages] = useState<Message[]>([]);
+    return <MessagesContext.Provider value={{ messages, setMessages }}>{children}</MessagesContext.Provider>;
 }

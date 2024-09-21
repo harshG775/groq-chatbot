@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import ChatArea from "@/components/pages_components/chat/ChatArea";
 import SidebarHistory from "@/components/pages_components/chat/SidebarHistory";
 import InputBar from "@/components/pages_components/chat/inputBar/InputBar";
+import ChatArea from "@/components/pages_components/chat/chatArea/ChatArea";
 
 export default function ChatPage() {
     return (
@@ -23,7 +23,7 @@ export default function ChatPage() {
             </div>
 
             <ChatArea />
-            <InputBar/>
+            <InputBar />
         </div>
     );
 }
