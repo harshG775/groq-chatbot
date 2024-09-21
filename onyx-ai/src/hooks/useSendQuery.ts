@@ -1,58 +1,61 @@
-// /* eslint-disable no-unused-vars */
-// /* eslint-disable @typescript-eslint/no-unused-vars */
+import { getGroqChatCompletion } from "@/services/groq/groq";
+import { useMessagesContext } from "@/store/context/Messages-context";
+import { useStreamMessageContext } from "@/store/context/StreamMessage-context";
+import { useUserInputContext } from "@/store/context/UserInput-context";
+import { FormEvent } from "react";
 
-// import { groq } from "@/services/groq.ai";
-// import { useStreamMessageContext } from "@/store/context/StreamMessage-context";
-// import { useState } from "react";
+export function useSendQuery() {
+    const { userInput } = useUserInputContext();
+    const { setStreamMessage, setStreaming, setLoading, setError } = useStreamMessageContext();
+    const { messages, setMessages } = useMessagesContext();
 
-// export function useSendQuery() {
-//     const {
-//         streamMessage,
-//         setStreamMessage,
-
-//         loading,
-//         setLoading,
-
-//         canceled,
-//         setCanceled,
-
-//         error,
-//         setError,
-//     } = useStreamMessageContext();
-
-//     const handleSendQuery = async ({ content }: { content: string }) => {
-//         try {
-//             const stream = await groq.chat.completions.create({
-//                 messages: [
-//                     {
-//                         role: "system",
-//                         content: "",
-//                     },
-//                     ...[],
-//                     {
-//                         role: "user",
-//                         content: content,
-//                     },
-//                 ],
-//                 model: "llama3-8b-8192",
-//                 temperature: 0.5,
-//                 max_tokens: 1024,
-//                 stop: null,
-//                 stream: true,
-//             });
-//             for await (const chunk of stream) {
-//                 setStreamMessage((prev) => {
-//                     return {
-//                         content: chunk.choices[0]?.delta?.content || "",
-//                         role: chunk.choices[0]?.delta?.role || "assistant",
-//                     };
-//                 });
-//             }
-//         } catch (error) {}
-//     };
-//     const handleCancelQuery = async () => {};
-//     return {
-//         handleSendQuery,
-//         handleCancelQuery,
-//     };
-// }
+    const handleSend = async (e: FormEvent) => {
+        e.preventDefault();
+        try {
+            setStreamMessage({
+                content: "",
+                role: "assistant",
+            });
+            setMessages((prev) => [
+                ...prev,
+                {
+                    content: userInput,
+                    role: "user",
+                },
+            ]);
+            setLoading(true);
+            const stream = await getGroqChatCompletion({
+                query: userInput,
+                history: messages,
+                model: "llama-3.1-8b-instant",
+            });
+            setStreaming(true);
+            let accumulated = "";
+            for await (const { choices } of stream) {
+                if (choices[0]?.finish_reason === "stop") {
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            content: accumulated || "something went wrong",
+                            role: "assistant",
+                        },
+                    ]);
+                    setStreaming(false);
+                    return;
+                }
+                accumulated = accumulated + choices[0]?.delta?.content || "";
+                setStreamMessage({
+                    content: accumulated,
+                    role: choices[0]?.delta?.role as "user",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            setError(error);
+        } finally {
+            setLoading(false);
+            setStreaming(false);
+        }
+    };
+    return { handleSend };
+}

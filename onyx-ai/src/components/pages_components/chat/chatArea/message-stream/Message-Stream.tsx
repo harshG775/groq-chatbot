@@ -1,11 +1,11 @@
 import { useStreamMessageContext } from "@/store/context/StreamMessage-context";
-import { Chat } from "./Chat-Stream";
+import { ChatStream } from "./Chat-Stream";
 
 export default function MessageStream() {
     const { streamMessage, streaming } = useStreamMessageContext();
     return (
         <>
-            {streaming && <Chat message={streamMessage} />}
+            {streaming && <ChatStream message={streamMessage} />}
         </>
     );
 }

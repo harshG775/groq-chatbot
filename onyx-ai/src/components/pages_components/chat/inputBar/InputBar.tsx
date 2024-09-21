@@ -1,71 +1,82 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { getGroqChatCompletion } from "@/services/groq/groq";
 import { useMessagesContext } from "@/store/context/Messages-context";
 import { useStreamMessageContext } from "@/store/context/StreamMessage-context";
-// import AutoGrowingTextarea from "@/components/pages_components/chat/inputBar/AutoGrowingTextarea";
 import { useUserInputContext } from "@/store/context/UserInput-context";
-import { FormEvent } from "react";
+import { ArrowUp, Square } from "lucide-react";
+import { FormEvent, useCallback } from "react";
+
 export default function InputBar() {
     const { userInput, setUserInput } = useUserInputContext();
-    const { setStreamMessage, setStreaming, setLoading, setError } = useStreamMessageContext();
-    //
+    const { setStreamMessage, setStreaming, loading, streaming, setLoading, setError } = useStreamMessageContext();
     const { messages, setMessages } = useMessagesContext();
 
-    //
-    const handleSend = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            setStreamMessage({
-                content: "",
-                role: "assistant",
-            });
-            setMessages((prev) => [
-                ...prev,
-                {
-                    content: userInput,
-                    role: "user",
-                },
-            ]);
+    const handleSend = useCallback(
+        async (e: FormEvent) => {
+            e.preventDefault();
+            if (!userInput.trim()) return;
+
             setLoading(true);
-            const stream = await getGroqChatCompletion({
-                query: userInput,
-                history: messages,
-                model: "llama-3.1-8b-instant",
-            });
-            setStreaming(true);
-            let accumulated = "";
-            for await (const { choices } of stream) {
-                if (choices[0]?.finish_reason === "stop") {
-                    setMessages((prev) => [
-                        ...prev,
-                        {
-                            content: accumulated || "something went wrong",
-                            role: "assistant",
-                        },
-                    ]);
-                    setStreaming(false);
-                    return;
-                }
-                accumulated = accumulated + choices[0]?.delta?.content || "";
-                setStreamMessage({
-                    content: accumulated,
-                    role: choices[0]?.delta?.role as "user",
+            setStreamMessage({ content: "", role: "assistant" });
+            setMessages((prev) => [...prev, { content: userInput, role: "user" }]);
+
+            try {
+                const stream = await getGroqChatCompletion({
+                    query: userInput,
+                    history: messages,
                 });
+                stream.controller;
+                let accumulated = "";
+                setStreaming(true);
+                for await (const { choices } of stream) {
+                    const choiceContent = choices[0]?.delta?.content || "";
+                    accumulated += choiceContent;
+
+                    if (choices[0]?.finish_reason === "stop") {
+                        setMessages((prev) => [...prev, { content: accumulated || "something went wrong", role: "assistant" }]);
+                        break;
+                    }
+
+                    setStreamMessage({
+                        content: accumulated,
+                        role: choices[0]?.delta?.role as "assistant",
+                    });
+                }
+            } catch (error) {
+                console.error("Error during message streaming:", error);
+                setError(error);
+            } finally {
+                setLoading(false);
+                setStreaming(false);
+                setUserInput("");
             }
-        } catch (error) {
-            console.log(error);
-            setError(error);
-        } finally {
-            setLoading(false);
-            setStreaming(false);
-        }
-    };
+        },
+        [userInput, messages, setLoading, setMessages, setStreamMessage, setStreaming, setError, setUserInput]
+    );
+
     return (
         <div className="rounded-md border p-2 mb-2">
-            {/* <AutoGrowingTextarea /> */}
             <form onSubmit={handleSend}>
-                <input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} />
-                <button>Send</button>
+                <div className="flex gap-2 items-end">
+                    <textarea
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        className="w-full resize-none p-2 border rounded"
+                        rows={3}
+                        placeholder="Type your message here..."
+                        disabled={loading || streaming}
+                    />
+                    {loading || streaming ? (
+                        <Button type="button" variant={"secondary"} className="rounded-full p-2.5" size={"icon"}>
+                            <Square className="w-8 h-8" />
+                        </Button>
+                    ) : (
+                        <Button type="submit" variant={"secondary"} className="rounded-full p-2.5" size={"icon"}>
+                            <ArrowUp className="w-8 h-8" />
+                        </Button>
+                    )}
+                </div>
             </form>
         </div>
     );

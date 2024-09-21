@@ -4,7 +4,7 @@ import Markdown from "@/lib/ReactMarkdown";
 import { Message } from "@/types/messages/message";
 import { Bot, UserCircle } from "lucide-react";
 
-export function Chat({ message }: { message: Message }) {
+export function ChatStream({ message }: { message: Message }) {
     return (
         <div className={`mt-8 w-full flex ${message.role === "user" ? "justify-end" : "justify-start flex-wrap"}`}>
             {message.role === "assistant" && (
