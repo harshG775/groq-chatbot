@@ -5,6 +5,7 @@ import ErrorPage from "./pages/error";
 import Loading from "./pages/loading";
 import Providers from "./components/providers/Providers";
 import NotFound from "./pages/not-found";
+import ChatPage from "./pages/chat/page";
 
 const router = createBrowserRouter([
     {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
             {
                 path: "/",
                 element: <HomePage />,
+            },
+            {
+                path: "/chat",
+                element: <ChatPage />,
             },
         ],
     },
