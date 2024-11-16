@@ -20,12 +20,11 @@ export default function InputArea({ className, ...props }) {
     const [isProcessing, setIsProcessing] = useState(false);
     const abortControllerRef = useRef(null);
     // Initialize the custom hook
-    const { isListening, startListening, stopListening, setRecognitionHandlers, error } =
-        useSpeechRecognition({
-            continuous: true,
-            interimResults: true,
-            language: "en-US",
-        });
+    const { isListening, startListening, stopListening, setRecognitionHandlers, error } = useSpeechRecognition({
+        continuous: true,
+        interimResults: true,
+        language: "en-US",
+    });
 
     // handle for speech recognition
 
@@ -53,12 +52,18 @@ export default function InputArea({ className, ...props }) {
         },
     });
     useEffect(() => {
-        if (!isProcessing && continuousListening) {
-            startListening();
-        } else {
-            stopListening();
-        }
-    }, [isProcessing, continuousListening, startListening, stopListening]);
+        const restartListening = async () => {
+            if (!isProcessing && continuousListening) {
+                await delay(1000);
+                startListening();
+            } else {
+                stopListening();
+            }
+        };
+        restartListening();
+        // ! eslint-disable-next-line
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isProcessing, continuousListening]);
 
     const handleStartListing = () => {
         setInputValue("");
@@ -66,6 +71,7 @@ export default function InputArea({ className, ...props }) {
         startListening();
     };
     const handleStopListing = () => {
+        setInputValue("");
         setContinuousListening(false);
         stopListening();
     };
@@ -131,19 +137,24 @@ export default function InputArea({ className, ...props }) {
     return (
         <div className={cn("overflow-y-auto border", className)} {...props}>
             <div className="pl-2 pr-4 flex gap-2 items-end">
-                {!continuousListening && (
-                    <Input value={inputValue} setValue={setInputValue} handleQuery={handleQuery} />
-                )}
-                {isListening && (
-                    <div className="self-center flex-1 flex gap-1 justify-center">
-                        <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-0"></div>
-                        <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-100"></div>
-                        <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-200"></div>
-                    </div>
-                )}
-                {error&&
-                <div className="self-center flex-1 flex gap-1 justify-center text-destructive text-sm">{error}</div>
-                }
+                <div className="w-full flex-1 flex gap-2 items-end">
+                    {!continuousListening && (
+                        <Input value={inputValue} setValue={setInputValue} handleQuery={handleQuery} />
+                    )}
+                    {isListening && (
+                        <div className="self-center flex-1 flex gap-1 justify-center">
+                            <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-0"></div>
+                            <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-100"></div>
+                            <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-200"></div>
+                        </div>
+                    )}
+                    {error && (
+                        <div className="self-center flex-1 flex gap-1 justify-center text-destructive text-sm">
+                            {error}
+                        </div>
+                    )}
+                </div>
+
                 {/* buttons */}
                 {!isProcessing && (
                     <VoiceInput
@@ -158,7 +169,7 @@ export default function InputArea({ className, ...props }) {
                         disabled={inputValue.trim("")?.length === 0 || continuousListening}
                         size="icon"
                         variant="default"
-                        className="rounded-full"
+                        className="rounded-full ml-auto"
                         onClick={handleQuery}
                     >
                         <Send className="h-6 w-6" />
