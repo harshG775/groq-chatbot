@@ -56,14 +56,12 @@ export default function InputArea({ className, ...props }) {
             if (!isProcessing && continuousListening) {
                 setTimeout(() => {
                     startListening();
-                }, 2000);
+                }, 2000); 
+            } else {
+                stopListening();
             }
         };
         restartListening();
-
-        return () => {
-            stopListening();
-        };
         // ! eslint-disable-next-line
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isProcessing, continuousListening]);
@@ -82,6 +80,9 @@ export default function InputArea({ className, ...props }) {
     // handles for request
     const handleQuery = async () => {
         if (!inputValue?.trim("")?.length === 0) {
+            return null;
+        }
+        if (isProcessing) {
             return null;
         }
         let accumulatedStreamContent = "\n";
