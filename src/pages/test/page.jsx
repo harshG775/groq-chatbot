@@ -23,6 +23,7 @@ export default function TestPage() {
             const transcriptResult = results[results.length - 1][0].transcript;
             setTranscript(transcriptResult);
             if (isFinal && !isProcessing) {
+                setTranscript(results[results.length - 1][0].transcript);
                 handleQuery();
             }
         },
