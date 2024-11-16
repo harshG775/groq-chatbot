@@ -54,13 +54,18 @@ export default function InputArea({ className, ...props }) {
     useEffect(() => {
         const restartListening = async () => {
             if (!isProcessing && continuousListening) {
-                await delay(1000);
-                startListening();
+                setTimeout(() => {
+                    startListening();
+                }, 2000);
             } else {
                 stopListening();
             }
         };
         restartListening();
+        
+        return () => {
+            stopListening();
+        };
         // ! eslint-disable-next-line
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isProcessing, continuousListening]);
