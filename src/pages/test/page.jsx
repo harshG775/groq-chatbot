@@ -16,23 +16,19 @@ export default function TestPage() {
     });
 
     // handle for speech recognition
-
     // Set up handlers for recognition events
     setRecognitionHandlers({
         onResult: ({ results }) => {
             const isFinal = results[results.length - 1].isFinal;
-            const resultText = Array.from(results)
-                .map((result) => result[0].transcript)
-                .join("");
-            setTranscript(resultText); // Update the transcript state
-            if (isFinal) {
+            const transcriptResult = results[results.length - 1][0].transcript;
+            setTranscript(transcriptResult);
+            if (isFinal && !isProcessing) {
                 handleQuery();
             }
         },
         onEnd: () => {
-            if (!isProcessing && continuousListening) {
+            if (continuousListening) {
                 startListening();
-                setContinuousListening(false);
             }
             console.log("Speech recognition has stopped.");
         },
@@ -40,13 +36,6 @@ export default function TestPage() {
             console.log("Speech recognition has started.");
         },
     });
-    useEffect(() => {
-        if (!isProcessing && continuousListening) {
-            startListening();
-        } else {
-            stopListening();
-        }
-    }, [isProcessing, continuousListening]);
 
     const handleStartListing = () => {
         setTranscript("");
@@ -61,14 +50,15 @@ export default function TestPage() {
     // handles for request
     const handleQuery = async () => {
         try {
-            setIsProcessing(true);
             setTranscript("");
+            setIsProcessing(true);
             await delay(1000);
             setMessages((prev) => [...prev, { content: transcript }]);
             setIsProcessing(false);
             // stream
         } catch (error) {
             console.log("error", error);
+            setTranscript("");
             setIsProcessing(false);
         }
     };
