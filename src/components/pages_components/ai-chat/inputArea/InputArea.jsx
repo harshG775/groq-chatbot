@@ -20,11 +20,12 @@ export default function InputArea({ className, ...props }) {
     const [isProcessing, setIsProcessing] = useState(false);
     const abortControllerRef = useRef(null);
     // Initialize the custom hook
-    const { isListening, startListening, stopListening, setRecognitionHandlers } = useSpeechRecognition({
-        continuous: true,
-        interimResults: true,
-        language: "en-US",
-    });
+    const { isListening, startListening, stopListening, setRecognitionHandlers, error } =
+        useSpeechRecognition({
+            continuous: true,
+            interimResults: true,
+            language: "en-US",
+        });
 
     // handle for speech recognition
 
@@ -140,6 +141,9 @@ export default function InputArea({ className, ...props }) {
                         <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-200"></div>
                     </div>
                 )}
+                {error&&
+                <div className="self-center flex-1 flex gap-1 justify-center text-destructive text-sm">{error}</div>
+                }
                 {/* buttons */}
                 {!isProcessing && (
                     <VoiceInput
