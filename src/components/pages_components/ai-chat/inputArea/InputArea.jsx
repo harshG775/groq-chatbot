@@ -57,12 +57,10 @@ export default function InputArea({ className, ...props }) {
                 setTimeout(() => {
                     startListening();
                 }, 2000);
-            } else {
-                stopListening();
             }
         };
         restartListening();
-        
+
         return () => {
             stopListening();
         };
