@@ -37,7 +37,9 @@ export default function InputArea({ className, ...props }) {
                 .join("");
             setInputValue(resultText); // Update the transcript state
             if (isFinal) {
-                handleQuery();
+                setTimeout(() => {
+                    handleQuery();
+                }, 2000); 
             }
         },
         onEnd: () => {
@@ -52,16 +54,11 @@ export default function InputArea({ className, ...props }) {
         },
     });
     useEffect(() => {
-        const restartListening = async () => {
             if (!isProcessing && continuousListening) {
-                setTimeout(() => {
-                    startListening();
-                }, 2000); 
+                startListening();
             } else {
                 stopListening();
             }
-        };
-        restartListening();
         // ! eslint-disable-next-line
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isProcessing, continuousListening]);
