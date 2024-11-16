@@ -37,9 +37,7 @@ export default function InputArea({ className, ...props }) {
                 .join("");
             setInputValue(resultText); // Update the transcript state
             if (isFinal) {
-                setTimeout(() => {
-                    handleQuery();
-                }, 2000); 
+                handleQuery();
             }
         },
         onEnd: () => {
@@ -54,11 +52,14 @@ export default function InputArea({ className, ...props }) {
         },
     });
     useEffect(() => {
+        setTimeout(() => {
             if (!isProcessing && continuousListening) {
                 startListening();
             } else {
                 stopListening();
             }
+        }, 4000);
+
         // ! eslint-disable-next-line
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isProcessing, continuousListening]);
