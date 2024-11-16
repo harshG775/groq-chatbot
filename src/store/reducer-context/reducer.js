@@ -25,6 +25,7 @@ export const storeReducer = (state, action) => {
 
         // messages
         case ActionTypes.SET_MESSAGES:
+            localStorage.setItem("messages", "[]");
             return { ...state, messages: action?.payload || [] };
         case ActionTypes.SET_MESSAGE:
             localStorage.setItem("messages", JSON.stringify([...(state?.messages || []), action?.payload]));
