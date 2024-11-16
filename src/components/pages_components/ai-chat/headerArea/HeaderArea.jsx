@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { ActionTypes } from "@/store/reducer-context/actions";
 import { useStoreContext } from "@/store/reducer-context/context";
 import { PanelRightClose, SquarePen } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function HeaderArea({ className, ...props }) {
     const { dispatch } = useStoreContext();
@@ -25,6 +26,16 @@ export default function HeaderArea({ className, ...props }) {
             <Button className="h-8 w-8 p-0 rounded-full" size={"icon"} variant="secondary">
                 <div className="border rounded-full h-8 w-8"></div>
             </Button>
+            <Link
+                to="/test"
+                className="h-8 w-8 p-0"
+                size={"icon"}
+                variant="ghost"
+                title="New chat"
+                onClick={handleNewChat}
+            >
+                <div className="h-4 w-4 text-foreground">Test</div>
+            </Link>
         </div>
     );
 }
