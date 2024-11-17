@@ -1,99 +1,160 @@
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Mic, MicOff, AlertCircle } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
-export default function TestPage() {
-    const [messages, setMessages] = useState([]);
-
+const TestPage = () => {
+    const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState("");
-    const [continuousListening, setContinuousListening] = useState(false); // Tracks if API is processing
-    const [isProcessing, setIsProcessing] = useState(false);
-    // Initialize the custom hook
-    const { isListening, startListening, stopListening, setRecognitionHandlers, error } = useSpeechRecognition({
-        continuous: true,
-        interimResults: true,
-        language: "en-US",
-    });
+    const [interimTranscript, setInterimTranscript] = useState("");
+    const [error, setError] = useState("");
+    const recognitionRef = useRef(null);
+    const timeoutRef = useRef(null);
 
-    // handle for speech recognition
-    // Set up handlers for recognition events
-    setRecognitionHandlers({
-        onResult: ({ results }) => {
-            const isFinal = results[results.length - 1].isFinal;
-            const transcriptResult = results[results.length - 1][0].transcript;
-            setTranscript(transcriptResult);
-            if (isFinal && !isProcessing) {
-                setTranscript(results[results.length - 1][0].transcript);
-                handleQuery();
-            }
-        },
-        onEnd: () => {
-            if (continuousListening) {
-                startListening();
-            }
-            console.log("Speech recognition has stopped.");
-        },
-        onStart: () => {
-            console.log("Speech recognition has started.");
-        },
-    });
-
-    const handleStartListing = () => {
-        setTranscript("");
-        setContinuousListening(true);
-        startListening();
-    };
-    const handleStopListing = () => {
-        setContinuousListening(false);
-        stopListening();
-    };
-
-    // handles for request
-    const handleQuery = async () => {
-        try {
-            setTranscript("");
-            setIsProcessing(true);
-            await delay(1000);
-            setMessages((prev) => [...prev, { content: transcript }]);
-            setIsProcessing(false);
-            // stream
-        } catch (error) {
-            console.log("error", error);
-            setTranscript("");
-            setIsProcessing(false);
+    const initializeSpeechRecognition = useCallback(() => {
+        if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
+            setError("Speech recognition is not supported in your browser");
+            return null;
         }
-    };
+
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognitionAPI();
+
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        return recognition;
+    }, []);
+
+    const handleResult = useCallback((event) => {
+        let finalTranscript = "";
+        let currentInterim = "";
+
+        // Clear the timeout on new speech
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        // Process results
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+            } else {
+                currentInterim = transcript;
+            }
+        }
+
+        // Update interim transcript immediately
+        setInterimTranscript(currentInterim);
+
+        // Set timeout for silence detection
+        timeoutRef.current = setTimeout(() => {
+            if (finalTranscript) {
+                setTranscript((prev) => prev + " " + finalTranscript);
+                setInterimTranscript("");
+            }
+        }, 1500);
+    }, []);
+
+    const startListening = useCallback(() => {
+        if (!recognitionRef.current) {
+            recognitionRef.current = initializeSpeechRecognition();
+        }
+
+        if (recognitionRef.current) {
+            try {
+                recognitionRef.current.start();
+                setIsListening(true);
+                setError("");
+            } catch (err) {
+                setError("Error starting speech recognition");
+            }
+        }
+    }, [initializeSpeechRecognition]);
+
+    const stopListening = useCallback(() => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsListening(false);
+            // Clear any pending timeouts
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!recognitionRef.current) {
+            recognitionRef.current = initializeSpeechRecognition();
+        }
+
+        if (recognitionRef.current) {
+            recognitionRef.current.onresult = handleResult;
+            recognitionRef.current.onerror = (event) => {
+                setError(`Speech recognition error: ${event.error}`);
+                setIsListening(false);
+            };
+            recognitionRef.current.onend = () => {
+                // Restart if we're supposed to be listening
+                if (isListening) {
+                    try {
+                        recognitionRef.current.start();
+                    } catch (err) {
+                        setError("Error restarting speech recognition");
+                        setIsListening(false);
+                    }
+                }
+            };
+        }
+
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+            }
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [handleResult, initializeSpeechRecognition, isListening]);
+
     return (
-        <div className={"overflow-y-auto"}>
-            <div className="flex flex-col gap-4 border p-4">
-                <Button onClick={handleStartListing} className="w-10 h-8 p-0">
-                    start
-                </Button>
-                <Button onClick={handleStopListing} className="w-10 h-8 p-0" variant={"destructive"}>
-                    stop
-                </Button>
-                <input disabled={true} value={transcript} onChange={(e) => setTranscript(e.target.value)} />
-                {isListening && (
-                    <div className=" self-center flex-1 flex gap-1 justify-center">
-                        <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-0"></div>
-                        <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-100"></div>
-                        <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-200"></div>
-                    </div>
-                )}
-                {error && (
-                    <div className="self-center flex-1 flex gap-1 justify-center text-destructive text-sm">{error}</div>
-                )}
+        <div className="w-full max-w-md mx-auto p-4 space-y-4">
+            <div className="flex flex-col items-center gap-4">
+                <button
+                    onClick={isListening ? stopListening : startListening}
+                    className={`p-4 rounded-full transition-colors ${
+                        isListening ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
+                    }`}
+                >
+                    {isListening ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
+                </button>
+                <div className="text-sm text-gray-500">{isListening ? "Tap to stop" : "Tap to start"}</div>
             </div>
-            <div>
-                {messages?.map((el, i) => (
-                    <div key={i}>{el.content}</div>
-                ))}
+
+            {error && (
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            <div className="space-y-2">
+                <div className="min-h-24 p-4 bg-gray-100 rounded-lg">
+                    <p className="text-gray-900">{transcript}</p>
+                    <p className="text-gray-500 italic">{interimTranscript}</p>
+                </div>
+
+                <button
+                    onClick={() => setTranscript("")}
+                    className="w-full px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                >
+                    Clear Transcript
+                </button>
             </div>
         </div>
     );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const delay = async (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export default TestPage;
