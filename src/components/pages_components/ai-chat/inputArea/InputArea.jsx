@@ -19,6 +19,8 @@ export default function InputArea({ className, ...props }) {
     const [continuousListening, setContinuousListening] = useState(false); // Tracks if API is processing
     const [isProcessing, setIsProcessing] = useState(false);
     const abortControllerRef = useRef(null);
+    const timeoutRef = useRef(null);
+
     // Initialize the custom hook
     const { isListening, startListening, stopListening, setRecognitionHandlers, error } = useSpeechRecognition({
         continuous: true,
@@ -30,15 +32,40 @@ export default function InputArea({ className, ...props }) {
 
     // Set up handlers for recognition events
     setRecognitionHandlers({
-        onResult: ({ results }) => {
-            const isFinal = results[results.length - 1].isFinal;
-            const resultText = Array.from(results)
-                .map((result) => result[0].transcript)
-                .join("");
-            setInputValue(resultText); // Update the transcript state
-            if (isFinal) {
-                handleQuery();
+        onResult: (event) => {
+            let finalTranscript = "";
+            let currentInterim = "";
+
+            // Clear the timeout on new speech
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
             }
+            // Process results
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    currentInterim = transcript;
+                }
+            }
+            console.log(event);
+
+            // Set timeout for silence detection
+            timeoutRef.current = setTimeout(() => {
+                if (finalTranscript) {
+                    // setInputValue(finalTranscript);
+                    handleQuery(finalTranscript);
+                }
+            }, 1500);
+            // const isFinal = event.results[event.results.length - 1].isFinal;
+            // const resultText = Array.from(event.results)
+            //     .map((result) => result[0].transcript)
+            //     .join("");
+            // setInputValue(resultText); // Update the transcript state
+            // if (isFinal) {
+            //     handleQuery();
+            // }
         },
         onEnd: () => {
             if (!isProcessing && continuousListening) {
@@ -76,7 +103,11 @@ export default function InputArea({ className, ...props }) {
     };
 
     // handles for request
-    const handleQuery = async () => {
+    const handleQuery = async (finalTranscript) => {
+        let inputValue = "";
+        if (continuousListening) {
+            inputValue = finalTranscript;
+        }
         if (!inputValue?.trim("")?.length === 0) {
             return null;
         }
