@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Mic, MicOff, AlertCircle } from "lucide-react";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const TestPage = () => {
     const [isListening, setIsListening] = useState(false);
@@ -133,11 +132,11 @@ const TestPage = () => {
             </div>
 
             {error && (
-                <Alert variant="destructive">
+                <div >
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                    <div>Error</div>
+                    <div>{error}</div>
+                </div>
             )}
 
             <div className="space-y-2">
