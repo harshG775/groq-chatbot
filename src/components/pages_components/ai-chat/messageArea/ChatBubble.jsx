@@ -23,7 +23,7 @@ export default function ChatBubble({ message }) {
                     </div>
                 </div>
                 <div className="p-2 rounded-l-2xl rounded-b-2xl bg-primary/80 text-primary-foreground shadow-inner shadow-primary">
-                    {message.content}
+                    <div className="overflow-x-auto shadow-inner">{message.content}</div>
                 </div>
             </div>
         );

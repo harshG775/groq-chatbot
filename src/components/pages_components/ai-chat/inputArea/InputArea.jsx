@@ -39,20 +39,28 @@ export default function InputArea({ className, ...props }) {
             setStreamingMessage({ role: "assistant", content: "", streaming: false });
             setIsProcessing(false);
         } catch (error) {
+            // Development log
+            console.log(error?.status);
+            console.log(error?.error);
+            //
+            setInputValue("");
+            setIsProcessing(false);
+            setStreamingMessage({ role: "assistant", content: "", streaming: false });
+
             if (error.message === "Request was aborted.") {
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     { role: "assistant", content: accumulatedStreamContent },
                 ]);
+                return;
             }
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { role: "assistant", content: `something went wrong\n ${error?.message}` },
-            ]);
-            console.log("error:\n", error);
-            setInputValue("");
-            setIsProcessing(false);
-            setStreamingMessage({ role: "assistant", content: "", streaming: false });
+            if (error?.error) {
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    { role: "assistant", content: `${error?.error?.error?.message}` },
+                ]);
+                return;
+            }
         }
     };
     const handleAbortQuery = async () => {
