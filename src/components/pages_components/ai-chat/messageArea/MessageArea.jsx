@@ -1,15 +1,16 @@
 import useScrollToBottom from "@/hooks/useScrollToBottom";
-import { useStoreContext } from "@/store/reducer-context/context";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import ChatBubble from "./ChatBubble";
-import { useMessageStreamContext } from "@/store/context/MessageStream-context";
+import { useMessagesContext } from "@/store/context/Messages-context";
+import { useStreamingMessageContext } from "@/store/context/StreamingMessage-context";
 import { Bot } from "lucide-react";
 
 export default function MessageArea({ className, ...props }) {
-    const { messageStream } = useMessageStreamContext();
-    const { state } = useStoreContext();
-    const { messages } = state;
+    const { streamingMessage } = useStreamingMessageContext();
+
+    const { messages } = useMessagesContext();
+
     const { scrollRef, scrollToBottom } = useScrollToBottom();
 
     // initialize
@@ -21,7 +22,6 @@ export default function MessageArea({ className, ...props }) {
     useEffect(() => {
         scrollToBottom({ behavior: "smooth" });
     }, [messages, scrollToBottom]);
-
     return (
         <div className={cn("overflow-y-auto border", className)} {...props} ref={scrollRef}>
             <div className="space-y-8 max-w-2xl mx-auto min-h-full">
@@ -36,7 +36,7 @@ export default function MessageArea({ className, ...props }) {
                 {messages?.map((el, i) => (
                     <ChatBubble key={i} message={el} />
                 ))}
-                {messageStream?.streaming && <ChatBubble message={messageStream} />}
+                {streamingMessage?.streaming && <ChatBubble message={streamingMessage} />}
                 <div className="h-20" />
             </div>
         </div>

@@ -1,157 +1,159 @@
-const initializeSpeechRecognition = (config) => {
-    // Default configuration
-    const defaultConfig = {
-        language: "en-US",
-        continuous: true,
-        interimResults: true,
-        maxAlternatives: 1,
-        silenceTimeout: 1500,
-        onStart: () => {},
-        onEnd: () => {},
-        onResult: () => {},
-        onError: () => {},
-    };
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Mic, MicOff, AlertCircle } from "lucide-react";
 
-    // Merge default config with provided config
-    const finalConfig = { ...defaultConfig, ...config };
+const TestPage = () => {
+    const [isListening, setIsListening] = useState(false);
+    const [transcript, setTranscript] = useState("");
+    const [interimTranscript, setInterimTranscript] = useState("");
+    const [error, setError] = useState("");
+    const recognitionRef = useRef(null);
+    const timeoutRef = useRef(null);
 
-    // Check browser support
-    if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
-        finalConfig.onError("Speech recognition is not supported in this browser");
-        return null;
-    }
-
-    let isListening = false;
-    let timeoutId = null;
-
-    // Initialize speech recognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-
-    // Configure recognition settings
-    recognition.continuous = finalConfig.continuous;
-    recognition.interimResults = finalConfig.interimResults;
-    recognition.maxAlternatives = finalConfig.maxAlternatives;
-    recognition.lang = finalConfig.language;
-
-    // Set up event handlers
-    recognition.onstart = () => {
-        isListening = true;
-        finalConfig.onStart();
-    };
-
-    recognition.onend = () => {
-        isListening = false;
-        finalConfig.onEnd();
-
-        // Restart if continuous mode is enabled and we're supposed to be listening
-        if (finalConfig.continuous && isListening) {
-            try {
-                recognition.start();
-            } catch (error) {
-                finalConfig.onError("Error restarting speech recognition");
-            }
+    const initializeSpeechRecognition = useCallback(() => {
+        if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
+            setError("Speech recognition is not supported in your browser");
+            return null;
         }
-    };
 
-    recognition.onerror = (event) => {
-        finalConfig.onError(`Speech recognition error: ${event.error}`);
-    };
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognitionAPI();
 
-    let finalTranscript = "";
-    let interimTranscript = "";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
 
-    recognition.onresult = (event) => {
-        // Clear existing timeout
-        if (timeoutId) {
-            clearTimeout(timeoutId);
+        return recognition;
+    }, []);
+
+    const handleResult = useCallback((event) => {
+        let finalTranscript = "";
+        let currentInterim = "";
+
+        // Clear the timeout on new speech
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
         }
 
         // Process results
-        interimTranscript = "";
-        finalTranscript = "";
-
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
-
             if (event.results[i].isFinal) {
                 finalTranscript += transcript;
             } else {
-                interimTranscript += transcript;
+                currentInterim = transcript;
             }
         }
 
-        // Call result handler with current state
-        finalConfig.onResult({
-            transcript: finalTranscript,
-            interimTranscript,
-            isFinal: false,
-        });
+        // Update interim transcript immediately
+        setInterimTranscript(currentInterim);
 
         // Set timeout for silence detection
-        timeoutId = setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
             if (finalTranscript) {
-                finalConfig.onResult({
-                    transcript: finalTranscript,
-                    interimTranscript: "",
-                    isFinal: true,
-                });
+                setTranscript((prev) => prev + " " + finalTranscript);
+                setInterimTranscript("");
             }
-        }, finalConfig.silenceTimeout);
-    };
+        }, 1500);
+    }, []);
 
-    // Return control methods
-    return {
-        recognition,
-        isListening,
-        start: () => {
-            if (!isListening) {
-                try {
-                    recognition.start();
-                } catch (error) {
-                    finalConfig.onError("Error starting speech recognition");
-                }
+    const startListening = useCallback(() => {
+        if (!recognitionRef.current) {
+            recognitionRef.current = initializeSpeechRecognition();
+        }
+
+        if (recognitionRef.current) {
+            try {
+                recognitionRef.current.start();
+                setIsListening(true);
+                setError("");
+            } catch (err) {
+                setError("Error starting speech recognition");
             }
-        },
-        stop: () => {
-            if (isListening) {
-                recognition.stop();
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                }
+        }
+    }, [initializeSpeechRecognition]);
+
+    const stopListening = useCallback(() => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsListening(false);
+            // Clear any pending timeouts
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
             }
-        },
-    };
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!recognitionRef.current) {
+            recognitionRef.current = initializeSpeechRecognition();
+        }
+
+        if (recognitionRef.current) {
+            recognitionRef.current.onresult = handleResult;
+            recognitionRef.current.onerror = (event) => {
+                setError(`Speech recognition error: ${event.error}`);
+                setIsListening(false);
+            };
+            recognitionRef.current.onend = () => {
+                // Restart if we're supposed to be listening
+                if (isListening) {
+                    try {
+                        recognitionRef.current.start();
+                    } catch (err) {
+                        setError("Error restarting speech recognition");
+                        setIsListening(false);
+                    }
+                }
+            };
+        }
+
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+            }
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [handleResult, initializeSpeechRecognition, isListening]);
+
+    return (
+        <div className="w-full max-w-md mx-auto p-4 space-y-4">
+            <div className="flex flex-col items-center gap-4">
+                <button
+                    onClick={isListening ? stopListening : startListening}
+                    className={`p-4 rounded-full transition-colors ${
+                        isListening ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
+                    }`}
+                >
+                    {isListening ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
+                </button>
+                <div className="text-sm text-gray-500">{isListening ? "Tap to stop" : "Tap to start"}</div>
+            </div>
+
+            {error && (
+                <div >
+                    <AlertCircle className="h-4 w-4" />
+                    <div>Error</div>
+                    <div>{error}</div>
+                </div>
+            )}
+
+            <div className="space-y-2">
+                <div className="min-h-24 p-4 bg-gray-100 rounded-lg">
+                    <p className="text-gray-900">{transcript}</p>
+                    <p className="text-gray-500 italic">{interimTranscript}</p>
+                </div>
+
+                <button
+                    onClick={() => setTranscript("")}
+                    className="w-full px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                >
+                    Clear Transcript
+                </button>
+            </div>
+        </div>
+    );
 };
 
-export default initializeSpeechRecognition;
-
-// Example usage:
-/*
-const speechRecognition = initializeSpeechRecognition({
-  language: 'en-US',
-  continuous: true,
-  interimResults: true,
-  silenceTimeout: 1500,
-  onStart: () => {
-    console.log('Speech recognition started');
-  },
-  onEnd: () => {
-    console.log('Speech recognition ended');
-  },
-  onResult: ({ transcript, interimTranscript, isFinal }) => {
-    console.log('Final:', transcript);
-    console.log('Interim:', interimTranscript);
-    console.log('Is Final:', isFinal);
-  },
-  onError: (error) => {
-    console.error('Error:', error);
-  }
-});
-
-// Start listening
-speechRecognition?.start();
-
-// Stop listening
-speechRecognition?.stop();
-*/
+export default TestPage;

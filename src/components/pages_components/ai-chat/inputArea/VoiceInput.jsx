@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 
-export default function VoiceInput({ inputValue, continuousListening, handleStartListing, handleStopListing }) {
+export default function VoiceInput({ inputValue, continuousListening }) {
+    const handleStartListing = () => {};
+    const handleStopListing = () => {};
     if (!continuousListening) {
         return (
             <>

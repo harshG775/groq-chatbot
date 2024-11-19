@@ -1,17 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ActionTypes } from "@/store/reducer-context/actions";
-import { useStoreContext } from "@/store/reducer-context/context";
+import { useMessagesContext } from "@/store/context/Messages-context";
 import { PanelRightClose, SquarePen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function HeaderArea({ className, ...props }) {
-    const { dispatch } = useStoreContext();
+    const { setMessages } = useMessagesContext();
     const handleNewChat = () => {
-        dispatch({
-            type: ActionTypes.SET_MESSAGES,
-            payload: [],
-        });
+        localStorage.removeItem("messages");
+        setMessages([]);
     };
     return (
         <div className={cn("overflow-y-auto border flex items-center", className)} {...props}>

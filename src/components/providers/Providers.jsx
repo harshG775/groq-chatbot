@@ -1,17 +1,20 @@
-import { MessageStreamProvider } from "@/store/context/MessageStream-context";
+import { StreamingMessageProvider } from "@/store/context/StreamingMessage-context";
 import { RefsContextProvider } from "@/store/context/Refs-context";
-import { StoreProvider } from "@/store/reducer-context/Provider";
+import { InputMessageProvider } from "@/store/context/MessageInput-context";
+import { MessagesProvider } from "@/store/context/Messages-context";
 
 export default function Providers({ children }) {
     return (
         <>
-            <StoreProvider>
-                <MessageStreamProvider>
-                    <RefsContextProvider>
-                        {children}
-                    </RefsContextProvider>
-                </MessageStreamProvider>
-            </StoreProvider>
+            <MessagesProvider>
+                <InputMessageProvider>
+                    <StreamingMessageProvider>
+                        <RefsContextProvider>
+                            {children}
+                        </RefsContextProvider>
+                    </StreamingMessageProvider>
+                </InputMessageProvider>
+            </MessagesProvider>
         </>
     );
 }

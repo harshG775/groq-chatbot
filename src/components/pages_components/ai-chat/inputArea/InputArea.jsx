@@ -1,113 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Send, StopCircle } from "lucide-react";
-import Input from "./Input";
-import { useEffect, useRef, useState } from "react";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
-import VoiceInput from "./VoiceInput";
+import { useRef, useState } from "react";
 import { groq } from "@/services/groq.ai";
-import { useMessageStreamContext } from "@/store/context/MessageStream-context";
-import { useStoreContext } from "@/store/reducer-context/context";
-import { ActionTypes } from "@/store/reducer-context/actions";
+import { useMessagesContext } from "@/store/context/Messages-context";
+import { useStreamingMessageContext } from "@/store/context/StreamingMessage-context";
 
 export default function InputArea({ className, ...props }) {
-    const { setMessageStream } = useMessageStreamContext();
-    const { state, dispatch } = useStoreContext();
-    const { messages } = state;
+    const { setStreamingMessage } = useStreamingMessageContext();
+    const { messages, setMessages } = useMessagesContext();
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const [inputValue, setInputValue] = useState("");
-    const [continuousListening, setContinuousListening] = useState(false); // Tracks if API is processing
-    const [isProcessing, setIsProcessing] = useState(false);
     const abortControllerRef = useRef(null);
-    const timeoutRef = useRef(null);
-
-    // Initialize the custom hook
-    const { isListening, startListening, stopListening, setRecognitionHandlers, error } = useSpeechRecognition({
-        continuous: true,
-        interimResults: true,
-        language: "en-US",
-    });
-
-    // handle for speech recognition
-
-    // Set up handlers for recognition events
-    setRecognitionHandlers({
-        onResult: (event) => {
-            let finalTranscript = "";
-            let currentInterim = "";
-
-            // Clear the timeout on new speech
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-            // Process results
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript;
-                } else {
-                    currentInterim = transcript;
-                }
-            }
-            console.log(event);
-
-            // Set timeout for silence detection
-            timeoutRef.current = setTimeout(() => {
-                if (finalTranscript) {
-                    // setInputValue(finalTranscript);
-                    handleQuery(finalTranscript);
-                }
-            }, 1500);
-            // const isFinal = event.results[event.results.length - 1].isFinal;
-            // const resultText = Array.from(event.results)
-            //     .map((result) => result[0].transcript)
-            //     .join("");
-            // setInputValue(resultText); // Update the transcript state
-            // if (isFinal) {
-            //     handleQuery();
-            // }
-        },
-        onEnd: () => {
-            if (!isProcessing && continuousListening) {
-                startListening();
-                setContinuousListening(false);
-            }
-            console.log("Speech recognition has stopped.");
-        },
-        onStart: () => {
-            console.log("Speech recognition has started.");
-        },
-    });
-    useEffect(() => {
-        setTimeout(() => {
-            if (!isProcessing && continuousListening) {
-                startListening();
-            } else {
-                stopListening();
-            }
-        }, 4000);
-
-        // ! eslint-disable-next-line
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isProcessing, continuousListening]);
-
-    const handleStartListing = () => {
-        setInputValue("");
-        setContinuousListening(true);
-        startListening();
-    };
-    const handleStopListing = () => {
-        setInputValue("");
-        setContinuousListening(false);
-        stopListening();
-    };
 
     // handles for request
-    const handleQuery = async (finalTranscript) => {
-        let inputValue = "";
-        if (continuousListening) {
-            inputValue = finalTranscript;
-        }
+    const handleQuery = async () => {
         if (!inputValue?.trim("")?.length === 0) {
             return null;
         }
@@ -117,11 +25,7 @@ export default function InputArea({ className, ...props }) {
         let accumulatedStreamContent = "\n";
         try {
             setIsProcessing(true);
-            setInputValue("");
-            dispatch({
-                type: ActionTypes.SET_MESSAGE,
-                payload: { role: "user", content: inputValue },
-            });
+            setMessages((prevMessages) => [...prevMessages, { role: "user", content: inputValue }]);
             // stream
             abortControllerRef.current = new AbortController();
             const stream = await groq.chat.completions.create(
@@ -140,27 +44,26 @@ export default function InputArea({ className, ...props }) {
                     signal: abortControllerRef.current.signal,
                 }
             );
+            setInputValue("");
             for await (const chunk of stream) {
-                if (chunk?.choices[0]?.finish_reason === "stop") {
-                    accumulatedStreamContent += "\n";
-                    dispatch({
-                        type: ActionTypes.SET_MESSAGE,
-                        payload: { role: "assistant", content: accumulatedStreamContent },
-                    });
-                    setMessageStream({ role: "assistant", content: "", streaming: false });
-                    setIsProcessing(false);
-                    return;
-                }
                 accumulatedStreamContent += chunk.choices[0]?.delta?.content || "";
-                setMessageStream({ role: "assistant", content: accumulatedStreamContent, streaming: true });
+                setStreamingMessage({ role: "assistant", content: accumulatedStreamContent, streaming: true });
             }
-        } catch (error) {
-            console.log("error", error);
+            accumulatedStreamContent += "\n";
+            setMessages((prevMessages) => [...prevMessages, { role: "assistant", content: accumulatedStreamContent }]);
+            setStreamingMessage({ role: "assistant", content: "", streaming: false });
             setIsProcessing(false);
-            dispatch({
-                type: ActionTypes.SET_MESSAGE,
-                payload: { role: "assistant", content: accumulatedStreamContent },
-            });
+        } catch (error) {
+            if (error.message === "Request was aborted.") {
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    { role: "assistant", content: accumulatedStreamContent },
+                ]);
+            }
+            console.log("error:\n", error);
+            setInputValue("");
+            setIsProcessing(false);
+            setStreamingMessage({ role: "assistant", content: "", streaming: false });
         }
     };
     const handleAbortQuery = async () => {
@@ -170,60 +73,51 @@ export default function InputArea({ className, ...props }) {
     return (
         <div className={cn("overflow-y-auto border", className)} {...props}>
             <div className="pl-2 pr-4 flex gap-2 items-end">
-                <div className="w-full flex-1 flex gap-2 items-end">
-                    {!continuousListening && (
-                        <Input value={inputValue} setValue={setInputValue} handleQuery={handleQuery} />
-                    )}
-                    {isListening && (
-                        <div className="self-center flex-1 flex gap-1 justify-center">
-                            <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-0"></div>
-                            <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-100"></div>
-                            <div className="w-4 h-4 rounded-full bg-primary animate-scale delay-200"></div>
-                        </div>
-                    )}
-                    {error && (
-                        <div className="self-center flex-1 flex gap-1 justify-center text-destructive text-sm">
-                            {error}
-                        </div>
-                    )}
-                </div>
-
-                {/* buttons */}
-                {!isProcessing && (
-                    <VoiceInput
-                        inputValue={inputValue}
-                        continuousListening={continuousListening}
-                        handleStartListing={handleStartListing}
-                        handleStopListing={handleStopListing}
+                <form
+                    className="flex-1 flex gap-2 items-center"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleQuery();
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Type here..."
+                        disabled={isProcessing}
+                        className="
+                                px-2 h-10 w-full rounded-md
+                                focus:outline focus:outline-2 focus:outline-input 
+                                shadow-inner 
+                            "
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                     />
-                )}
-                {!isProcessing && (
-                    <Button
-                        disabled={inputValue.trim("")?.length === 0 || continuousListening}
-                        size="icon"
-                        variant="default"
-                        className="rounded-full ml-auto"
-                        onClick={handleQuery}
-                    >
-                        <Send className="h-6 w-6" />
-                    </Button>
-                )}
-                {isProcessing && (
-                    <Button
-                        onClick={handleAbortQuery}
-                        size="icon"
-                        variant="destructive"
-                        className="ml-auto rounded-full"
-                    >
-                        <StopCircle className="h-10 w-10" />
-                    </Button>
-                )}
+                    <div>
+                        {!isProcessing && (
+                            <Button
+                                disabled={isProcessing || inputValue.trim("")?.length === 0}
+                                size="icon"
+                                variant="default"
+                                className="rounded-full ml-auto"
+                                type="submit"
+                            >
+                                <Send className="h-6 w-6" />
+                            </Button>
+                        )}
+                        {isProcessing && (
+                            <Button
+                                onClick={handleAbortQuery}
+                                size="icon"
+                                variant="destructive"
+                                className="ml-auto rounded-full"
+                                type="button"
+                            >
+                                <StopCircle className="h-10 w-10" />
+                            </Button>
+                        )}
+                    </div>
+                </form>
             </div>
         </div>
     );
 }
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const delay = async (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
