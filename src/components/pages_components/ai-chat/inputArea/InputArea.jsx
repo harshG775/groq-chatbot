@@ -24,8 +24,8 @@ export default function InputArea({ className, ...props }) {
         }
         let accumulatedStreamContent = "\n";
         try {
-            setIsProcessing(true);
             setMessages((prevMessages) => [...prevMessages, { role: "user", content: inputValue }]);
+            setIsProcessing(true);
             // stream
             abortControllerRef.current = new AbortController();
             const stream = await groq.chat.completions.create(
@@ -98,7 +98,7 @@ export default function InputArea({ className, ...props }) {
                                 disabled={isProcessing || inputValue.trim("")?.length === 0}
                                 size="icon"
                                 variant="default"
-                                className="rounded-full ml-auto"
+                                className="rounded-full ml-auto animate-in zoom-in-110"
                                 type="submit"
                             >
                                 <Send className="h-6 w-6" />
@@ -109,10 +109,10 @@ export default function InputArea({ className, ...props }) {
                                 onClick={handleAbortQuery}
                                 size="icon"
                                 variant="destructive"
-                                className="ml-auto rounded-full"
+                                className="ml-auto rounded-full animate-in zoom-in-110"
                                 type="button"
                             >
-                                <StopCircle className="h-10 w-10" />
+                                <StopCircle className="h-6 w-6" />
                             </Button>
                         )}
                     </div>
