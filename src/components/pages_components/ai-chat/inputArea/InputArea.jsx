@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Send, StopCircle } from "lucide-react";
 import { useRef, useState } from "react";
-import { groq } from "@/services/groq.ai";
+import { getGroqChatCompletion } from "@/services/groq/groq.ai";
 import { useMessagesContext } from "@/store/context/Messages-context";
 import { useStreamingMessageContext } from "@/store/context/StreamingMessage-context";
 
@@ -28,22 +28,7 @@ export default function InputArea({ className, ...props }) {
             setIsProcessing(true);
             // stream
             abortControllerRef.current = new AbortController();
-            const stream = await groq.chat.completions.create(
-                {
-                    messages: [
-                        ...messages,
-                        {
-                            role: "user",
-                            content: inputValue,
-                        },
-                    ],
-                    model: "llama3-8b-8192",
-                    stream: true,
-                },
-                {
-                    signal: abortControllerRef.current.signal,
-                }
-            );
+            const stream = await getGroqChatCompletion(messages, inputValue, abortControllerRef.current.signal);
             setInputValue("");
             for await (const chunk of stream) {
                 accumulatedStreamContent += chunk.choices[0]?.delta?.content || "";
@@ -60,6 +45,10 @@ export default function InputArea({ className, ...props }) {
                     { role: "assistant", content: accumulatedStreamContent },
                 ]);
             }
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                { role: "assistant", content: `something went wrong\n ${error?.message}` },
+            ]);
             console.log("error:\n", error);
             setInputValue("");
             setIsProcessing(false);
