@@ -18,7 +18,7 @@ export const getGroqChatCompletion = async (messages, inputValue, signal) => {
                 },
             ],
             model: "llama-3.1-70b-versatile",
-            max_tokens: 500,
+            // max_tokens: 500,
             stream: true,
         },
         {
