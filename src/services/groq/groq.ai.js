@@ -1,6 +1,5 @@
 import Groq from "groq-sdk";
-import systemPrompt from "./systemPrompt";
-import systemMessages from "./systemPrompt";
+import systemMessages from "./systemMessages";
 const apiKey = import.meta.env.VITE_GROQ_API_KEY;
 export const groq = new Groq({
     dangerouslyAllowBrowser: true,
