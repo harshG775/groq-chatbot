@@ -184,32 +184,30 @@ export default function ReactSyntaxHighlighter({
     };
 
     return (
-        <div className={`relative group ${className}`}>
-            {/* Header bar with language and copy button */}
-            <div className="absolute right-2 top-2 left-2 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className={`relative ${className} py-8`}>
+            {/* Sticky header bar with language and copy button */}
+            <div className="sticky -top-2.5 right-0 left-0 rounded-t-lg flex justify-between items-center p-2 bg-secondary z-10">
                 {/* Language indicator */}
-                <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 rounded text-sm bg-gray-700/50 text-gray-200 backdrop-blur-sm">
-                        {displayLanguage}
-                    </span>
+                <div className="flex items-center">
+                    <span className="px-2 py-1 rounded text-sm text-secondary-foreground">{displayLanguage}</span>
                 </div>
 
                 {/* Copy button */}
                 <button
                     onClick={handleCopy}
-                    className="px-2 py-1 rounded text-sm bg-gray-700/50 text-gray-200 
-                     hover:bg-gray-600 focus:outline-none focus:ring-2 
-                     focus:ring-gray-500 backdrop-blur-sm flex items-center gap-1
-                     transition-colors duration-200"
+                    className="px-2 py-1 rounded text-sm text-secondary-foreground 
+                   hover:bg-secondary-foreground/10 focus:outline-none focus:ring-2 
+                   focus:ring-input flex items-center gap-1
+                   transition-colors duration-200"
                     aria-label={copied ? "Copied!" : "Copy code"}
                 >
                     {copied ? (
                         <>
-                            <CheckIcon /> Copied!
+                            <CheckIcon className="w-4 h-4" /> Copied!
                         </>
                     ) : (
                         <>
-                            <CopyIcon /> Copy
+                            <CopyIcon className="w-4 h-4" /> Copy
                         </>
                     )}
                 </button>
@@ -222,10 +220,9 @@ export default function ReactSyntaxHighlighter({
                 wrapLines={wrapLines}
                 wrapLongLines={wrapLines}
                 customStyle={{
-                    margin: "1rem 0",
                     borderRadius: "0.5rem",
                     fontSize: "0.875rem",
-                    padding: "2.5rem 1rem 1rem 1rem",
+                    padding: "1rem",
                 }}
                 {...props}
             >
