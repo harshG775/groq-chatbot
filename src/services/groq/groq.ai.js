@@ -1,3 +1,6 @@
+//how to write function call in groq api with streaming enabled
+
+
 import Groq from "groq-sdk";
 import systemMessages from "./systemMessages";
 const apiKey = import.meta.env.VITE_GROQ_API_KEY;
@@ -10,7 +13,10 @@ export const getGroqChatCompletion = async (messages, inputValue, signal) => {
     return groq.chat.completions.create(
         {
             messages: [
-                ...systemMessages,
+                {
+                    role: "system",
+                    content: systemMessages,
+                },
                 ...messages,
                 {
                     role: "user",
