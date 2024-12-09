@@ -1,90 +1,45 @@
 import { Button } from "@/components/ui/button";
-import { SquarePen } from "lucide-react";
-import { useState } from "react";
+import Markdown from "@/components/ui/Markdown";
+import { ArrowUpNarrowWide, SquarePen } from "lucide-react";
+import { Fragment, useEffect, useState } from "react";
 
-export default function TestPage() {
-    const [histories, setHistories] = useState([
-        {
-            id: "1",
-            title: "First Chat",
-            messages: [
-                { role: "user", content: "Hi there!" },
-                { role: "assistant", content: "Hello! How can I help?" },
-            ],
-        },
-        {
-            id: "2",
-            title: "Second Chat",
-            messages: [
-                { role: "user", content: "What's the weather like?" },
-                { role: "assistant", content: "It’s sunny today." },
-            ],
-        },
-        {
-            id: "3",
-            title: "Third Chat",
-            messages: [
-                { role: "user", content: "Tell me a joke." },
-                { role: "assistant", content: "Why don’t skeletons fight each other? They don’t have the guts!" },
-            ],
-        },
-    ]);
+const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1N2ZhZTYwLWY3MjctNGYyMC05MmM0LTUxOTk3MTI4MzM2OCIsIm5hbWUiOiJoYXJzaCIsImVtYWlsIjoiaGFyc2guMUBnbWFpbC5jb20iLCJ0eXBlIjoiQUNDRVNTIiwiaWF0IjoxNzMzNzM3ODI4LCJleHAiOjE3MzM3NDE0Mjh9.R7X1YJx0NFpeXKmiBwuyM1F26r6CUkfLb0QF1MxoiSA";
 
-    const [selectedHistory, setSelectedHistory] = useState(null);
-    const [newMessage, setNewMessage] = useState("");
+function SideBar({ setCurrentHistory, currentHistory }) {
+    const [histories, setHistories] = useState([]);
+    useEffect(() => {
+        const handleFetchHistories = async () => {
+            const response = await fetch("https://onyx-ai-server.vercel.app/api/v1/histories", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
 
-    // Handle history selection
-    const handleHistoryClick = (historyId) => {
-        setSelectedHistory(historyId);
-    };
-
-    // Handle creating a new chat
-    const handleCreateNewChat = () => {
-        setSelectedHistory(null); // Clear current selection
-        setNewMessage(""); // Clear input
-    };
-
-    // Add a new chat
-    const handleStartNewChat = () => {
-        if (!newMessage.trim()) return;
-
-        const newChat = {
-            id: (histories.length + 1).toString(),
-            title: `New Chat ${histories.length + 1}`,
-            messages: [{ role: "user", content: newMessage.trim() }],
+            setHistories(data?.data?.histories);
         };
-
-        setHistories([newChat, ...histories]); // Add new chat at the top
-        setSelectedHistory(newChat.id); // Select the new chat
-        setNewMessage(""); // Clear input
+        handleFetchHistories();
+    }, []);
+    const handleSetCurrentHistory = async (historyId) => {
+        const response = await fetch(`https://onyx-ai-server.vercel.app/api/v1/histories/${historyId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        setCurrentHistory(data?.data?.history);
     };
-
-    // Add a message to the selected history
-    const handleSendMessage = () => {
-        if (!newMessage.trim() || !selectedHistory) return;
-
-        setHistories((prevHistories) =>
-            prevHistories.map((history) =>
-                history.id === selectedHistory
-                    ? {
-                          ...history,
-                          messages: [...history.messages, { role: "user", content: newMessage.trim() }],
-                      }
-                    : history
-            )
-        );
-
-        setNewMessage(""); // Clear input
+    const handleShowCreateNewChat = () => {
+        setCurrentHistory(null);
     };
-
-    const selectedMessages = selectedHistory
-        ? histories.find((history) => history.id === selectedHistory)?.messages || []
-        : [];
-
     return (
-        <div className="flex h-screen">
-            {/* Sidebar for history */}
-            <div className="flex-shrink-0 w-1/4 bg-gray-100 p-4">
+        <div className="flex-shrink-0 p-2 min-w-64">
+            <div>
                 <div className="flex justify-between items-center mb-4">
                     <p className="font-bold">Chat Histories</p>
                     <Button
@@ -93,79 +48,65 @@ export default function TestPage() {
                         variant="ghost"
                         title="Start a new chat"
                         aria-label="Start a new chat"
-                        onClick={handleCreateNewChat}
+                        onClick={handleShowCreateNewChat}
                     >
                         <SquarePen className="h-4 w-4 text-foreground" />
                     </Button>
                 </div>
-                <ul className="flex flex-col-reverse">
-                    {histories.map((history) => (
-                        <li
-                            key={history.id}
-                            className={`p-2 cursor-pointer rounded ${
-                                selectedHistory === history.id ? "bg-blue-500 text-white" : "hover:bg-gray-200"
-                            }`}
-                            onClick={() => handleHistoryClick(history.id)}
-                        >
-                            {history.title}
-                        </li>
-                    ))}
-                </ul>
             </div>
+            <ul>
+                {histories?.map((history) => (
+                    <li key={history?.id} onClick={() => handleSetCurrentHistory(history?.id)}>
+                        <Button variant={currentHistory?.id === history?.id ? "default" : "ghost"}>
+                            {history?.title}
+                        </Button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+function MainArea({ currentHistory }) {
+    return (
+        <main>
+            <ul className="flex flex-col gap-4 p-2">
+                {currentHistory?.messages?.map((message) => (
+                    <Fragment key={message?.id}>
+                        {message?.role === "user" && (
+                            <li className="p-2 border rounded-lg self-end">
+                                <div>user</div>
+                                <div>{message?.content}</div>
+                            </li>
+                        )}
+                        {message?.role === "assistant" && (
+                            <li className="p-2 border rounded-lg ">
+                                <div>assistant</div>
+                                <Markdown>{message?.content}</Markdown>
+                            </li>
+                        )}
+                    </Fragment>
+                ))}
+            </ul>
+        </main>
+    );
+}
 
-            {/* Main area for messages */}
-            <main className="flex-1 overflow-y-auto p-4">
-                {selectedHistory ? (
-                    <>
-                        <ul>
-                            {selectedMessages.map((message, index) => (
-                                <li
-                                    key={index}
-                                    className={`p-2 my-2 rounded ${
-                                        message.role === "user" ? "bg-gray-200 text-left" : "bg-blue-100 text-right"
-                                    }`}
-                                >
-                                    <span className="font-semibold capitalize">{message.role}: </span>
-                                    {message.content}
-                                </li>
-                            ))}
-                        </ul>
-                        <div className="flex mt-4">
-                            <input
-                                type="text"
-                                placeholder="Type your message..."
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
-                                className="flex-1 border p-2 rounded-l"
-                            />
-                            <button
-                                onClick={handleSendMessage}
-                                className="bg-blue-500 text-white px-4 rounded-r"
-                                aria-label="Send message"
-                            >
-                                Send
-                            </button>
+export default function TestPage() {
+    const [currentHistory, setCurrentHistory] = useState(null);
+    return (
+        <div className="flex ">
+            <SideBar setCurrentHistory={setCurrentHistory} currentHistory={currentHistory} />
+            <MainArea currentHistory={currentHistory} />
+            {!currentHistory && (
+                <main className="grid place-content-center ">
+                    <form className="flex gap-2">
+                        <input type="text" placeholder="Type your message..." className="border p-2 rounded w-full" />
+                        <div>
+                            <Button>Send</Button>
                         </div>
-                    </>
-                ) : (
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <input
-                            type="text"
-                            placeholder="Type your message to start a new chat..."
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            className="border p-2 rounded w-2/3"
-                        />
-                        <button
-                            onClick={handleStartNewChat}
-                            className="bg-blue-500 text-white px-4 py-2 mt-4 rounded"
-                            aria-label="Start new chat"
-                        >
-                            Start New Chat
-                        </button>
-                    </div>
-                )}
-            </main>
+                    </form>
+                </main>
+            )}
         </div>
     );
 }
