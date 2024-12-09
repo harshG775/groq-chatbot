@@ -6,8 +6,13 @@ import ErrorPage from "./pages/error";
 import Loading from "./pages/loading";
 import Providers from "./components/providers/Providers";
 import NotFound from "./pages/not-found";
+import LoginPage from "./pages/(auth)/login/page";
 
 const router = createBrowserRouter([
+    {
+        path: "/login",
+        element: <LoginPage />,
+    },
     {
         path: "/",
         errorElement: <ErrorPage />,
