@@ -7,6 +7,7 @@ import Loading from "./pages/loading";
 import Providers from "./components/providers/Providers";
 import NotFound from "./pages/not-found";
 import LoginPage from "./pages/(auth)/login/page";
+import PrivateRoute from "./utils/PrivateRoute";
 
 const router = createBrowserRouter([
     {
@@ -21,7 +22,11 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <HomePage />,
+                element: (
+                    <PrivateRoute>
+                        <HomePage />
+                    </PrivateRoute>
+                ),
             },
             {
                 path: "/test",
