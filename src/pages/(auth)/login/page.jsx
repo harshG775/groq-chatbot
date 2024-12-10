@@ -6,16 +6,16 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { Fetch } from "@/utils/Fetch";
 import { catchError } from "@/utils/catchError";
-import { useCookie } from "@/hooks/useCookie";
+import { useCookieContext } from "@/store/context/cookie-context";
 export default function LoginPage() {
-    const cookieStore = useCookie();
+    const cookieStore = useCookieContext()
     //
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -40,6 +40,7 @@ export default function LoginPage() {
 
         setIsLoading(false);
     };
+    console.log();
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
