@@ -1,18 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMessagesContext } from "@/store/context/Messages-context";
+import useStore from "@/store/zustand/useStore";
 import { PanelRightClose, SquarePen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function HeaderArea({ className, ...props }) {
+    const { isSidebarOpen, setIsSidebarOpen } = useStore();
+
     const { setMessages } = useMessagesContext();
     const handleNewChat = () => {
         localStorage.removeItem("messages");
         setMessages([]);
     };
+    const handleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
     return (
-        <div className={cn("overflow-y-auto border flex items-center", className)} {...props}>
-            <Button className="h-8 w-8 p-0" size={"icon"} variant="ghost">
+        <div className={cn("overflow-y-auto flex items-center shadow-md", className)} {...props}>
+            <Button className={`${isSidebarOpen ? "md:w-0" : "md:w-8"} h-8 p-0 transition-[width]`} size={"icon"} variant="ghost" onClick={handleSidebar}>
                 <PanelRightClose className="h-4 w-4 text-foreground" />
             </Button>
             <Button className="h-8 w-8 p-0" size={"icon"} variant="ghost" title="New chat" onClick={handleNewChat}>
@@ -23,16 +29,6 @@ export default function HeaderArea({ className, ...props }) {
             <Button className="h-8 w-8 p-0 rounded-full" size={"icon"} variant="secondary">
                 <div className="border rounded-full h-8 w-8"></div>
             </Button>
-            <Link
-                to="/test"
-                className="h-8 w-8 p-0"
-                size={"icon"}
-                variant="ghost"
-                title="New chat"
-                onClick={handleNewChat}
-            >
-                <div className="h-4 w-4 text-foreground">Test</div>
-            </Link>
         </div>
     );
 }
