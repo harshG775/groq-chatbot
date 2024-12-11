@@ -34,7 +34,7 @@ export default function LoginPage() {
         }
         if (!error && response.ok) {
             const data = await response.json();
-            cookieStore.set("token", data?.data?.token || undefined);
+            cookieStore.set("token", data?.data?.token || undefined,{expires: new Date(Date.now() + 60 * 60 * 1000) }); //1h
             navigate("/");
         }
 
