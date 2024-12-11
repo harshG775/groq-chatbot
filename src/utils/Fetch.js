@@ -1,7 +1,7 @@
-class ResponseError extends Error {
-    constructor(message, res) {
+export class ResponseError extends Error {
+    constructor(message, response) {
         super(message);
-        this.response = res;
+        this.response = response;
     }
 }
 
@@ -13,9 +13,10 @@ class ResponseError extends Error {
  * @throws {ResponseError} - If the fetch response status is not OK (i.e., not in the range 200–299).
  */
 export async function Fetch(input, init) {
-    const res = await fetch(input, init);
-    if (!res.ok) {
-        throw new ResponseError("Bad fetch response", res);
+    const response = await fetch(input, init);
+    if (!response.ok) {
+        const errorDetails = await response.json().catch(() => ({})); // Fallback to empty object if JSON parsing fails
+        throw new ResponseError(`Fetch failed with status ${response.status}`, { ...response, ...errorDetails });
     }
-    return res;
+    return response;
 }

@@ -1,13 +1,16 @@
 /**
  * Utility function to catch errors from a promise.
- * @param {Promise} promise - The promise to execute.
- * @returns {Promise<[Error|null, any|null]>} - A promise that resolves to an array containing an error or result.
+ * @template T
+ * @param {Promise<T>|T} promise - The promise or value to execute.
+ * @returns {Promise<[Error|undefined, T|undefined]>} - A promise that resolves to an array containing an error or result.
  */
 export async function catchError(promise) {
     try {
-        const result = await promise;
-        return [null, result];
+        const result = promise instanceof Promise 
+            ? await promise 
+            : promise;
+        return [undefined, result];
     } catch (error) {
-        return [error, null];
+        return [error instanceof Error ? error : new Error(String(error)), null];
     }
 }
