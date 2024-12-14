@@ -5,6 +5,10 @@ import { useRef, useState } from "react";
 import { getGroqChatCompletion } from "@/services/groq/groq.ai";
 import { useMessagesContext } from "@/store/context/Messages-context";
 import { useStreamingMessageContext } from "@/store/context/StreamingMessage-context";
+import { catchError } from "@/utils/catchError";
+import useStore from "@/store/zustand/useStore";
+import { Fetch } from "@/utils/Fetch";
+import { useCookieContext } from "@/store/context/Cookie-context";
 
 export default function InputArea({ className, ...props }) {
     const { setStreamingMessage } = useStreamingMessageContext();
@@ -13,7 +17,32 @@ export default function InputArea({ className, ...props }) {
 
     const [inputValue, setInputValue] = useState("");
     const abortControllerRef = useRef(null);
+    const { currentHistory, setCurrentHistory } = useStore();
+    const cookieStore = useCookieContext();
 
+
+    const handleCreateNewChat = async () => {
+        const token = cookieStore.get("token");
+        console.log("token");
+        console.log(token);
+        const [error, response] = await catchError(
+            Fetch("https://onyx-ai-server.vercel.app/api/v1/histories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+        );
+        if (error) {
+            console.error("Fetch error:", error.message, "\nResponse:", error.response);
+        }
+        if (!error && response?.ok) {
+            const data = await response.json();
+            setCurrentHistory(data?.data?.history);
+            // setChatHistory(prev=>[...prev,data?.data?.history]);
+        }
+    };
     // handles for request
     const handleQuery = async () => {
         if (!inputValue?.trim("")?.length === 0) {
@@ -21,6 +50,9 @@ export default function InputArea({ className, ...props }) {
         }
         if (isProcessing) {
             return null;
+        }
+        if (currentHistory === null) {
+            await handleCreateNewChat();
         }
         let accumulatedStreamContent = "\n";
         try {

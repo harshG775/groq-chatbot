@@ -8,17 +8,14 @@ import { EllipsisVertical, PanelRightOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Sidebar() {
-    const { isSidebarOpen, setIsSidebarOpen } = useStore();
+    const { isSidebarOpen, setIsSidebarOpen, currentHistory, setCurrentHistory } = useStore();
     const cookieStore = useCookieContext();
-    
+
     const [chatHistory, setChatHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
-    
-    const [currentHistory, setCurrentHistory] = useState(null);
-    const {messages, setMessages} = useMessagesContext()
-
+    const { messages, setMessages } = useMessagesContext();
 
     useEffect(() => {
         const handleFetchHistories = async () => {

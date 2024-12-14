@@ -3,14 +3,13 @@ import { cn } from "@/lib/utils";
 import { useMessagesContext } from "@/store/context/Messages-context";
 import useStore from "@/store/zustand/useStore";
 import { PanelRightClose, SquarePen } from "lucide-react";
-import { Link } from "react-router-dom";
-
 export default function HeaderArea({ className, ...props }) {
-    const { isSidebarOpen, setIsSidebarOpen } = useStore();
+    const { isSidebarOpen, setIsSidebarOpen,setCurrentHistory } = useStore();
 
     const { setMessages } = useMessagesContext();
     const handleNewChat = () => {
         localStorage.removeItem("messages");
+        setCurrentHistory(null)
         setMessages([]);
     };
     const handleSidebar = () => {
