@@ -6,7 +6,7 @@ import { ChartNoAxesGantt, SquarePen } from "lucide-react";
 export default function Header({ ...props }) {
     const { isSidebarOpen, setIsSidebarOpen } = useZustandStore((state) => state);
     return (
-        <div className={cn("p-2 flex justify-between min-h-10", props?.className)}>
+        <div className={cn("p-2 flex justify-between", props?.className)}>
             <div>
                 <Button
                     className={`h-8 w-8 p-0 block ${isSidebarOpen ? "md:invisible" : "md:visible"}`}

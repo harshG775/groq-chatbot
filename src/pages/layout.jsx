@@ -1,4 +1,5 @@
 import Header from "@/components/pages_components/home_page/header/Header";
+import InputBar from "@/components/pages_components/home_page/inputBar/InputBar";
 import Sidebar from "@/components/pages_components/home_page/sidebar/Sidebar";
 import useZustandStore from "@/store/zustand/useZustandStore";
 import { Outlet } from "react-router-dom";
@@ -16,11 +17,14 @@ export default function RootLayout() {
             <div
                 className={`${
                     isSidebarOpen ? "md:ml-72" : "md:ml-0"
-                } transition-[margin-left] duration-300 ease-in-out `}
+                } transition-[margin-left] duration-300 ease-in-out  h-dvh overflow-hidden flex flex-col`}
             >
-                <Header className={"sticky top-0 z-30 bg-background "} />
+                <Header />
 
-                <Outlet />
+                <div className="flex-1 overflow-auto">
+                    <Outlet />
+                </div>
+                <InputBar />
             </div>
         </>
     );
