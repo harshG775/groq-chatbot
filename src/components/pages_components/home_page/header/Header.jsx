@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import useZustandStore from "@/store/zustand/useZustandStore";
-import { ChartNoAxesGantt } from "lucide-react";
+import { ChartNoAxesGantt, SquarePen } from "lucide-react";
 
-export default function Header() {
+export default function Header({ ...props }) {
     const { isSidebarOpen, setIsSidebarOpen } = useZustandStore((state) => state);
     return (
-        <div className="p-2 flex justify-between min-h-10">
+        <div className={cn("p-2 flex justify-between min-h-10", props?.className)}>
             <div>
                 <Button
                     className={`h-8 w-8 p-0 block ${isSidebarOpen ? "md:invisible" : "md:visible"}`}
@@ -14,6 +15,12 @@ export default function Header() {
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 >
                     <ChartNoAxesGantt />
+                </Button>
+            </div>
+            <div>Groq ChatGPT</div>
+            <div>
+                <Button className={`h-8 w-8 p-0 ${isSidebarOpen ? "md:invisible" : "md:visible"}`} size={"icon"} variant="ghost" onClick={() => setIsSidebarOpen(false)}>
+                    <SquarePen />
                 </Button>
             </div>
         </div>

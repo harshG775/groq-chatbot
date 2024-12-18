@@ -13,12 +13,13 @@ export default function RootLayout() {
                     ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
                 `}
             />
-            <Header />
             <div
                 className={`${
                     isSidebarOpen ? "md:ml-72" : "md:ml-0"
                 } transition-[margin-left] duration-300 ease-in-out `}
             >
+                <Header className={"sticky top-0 z-50 bg-background "} />
+
                 <Outlet />
             </div>
         </>

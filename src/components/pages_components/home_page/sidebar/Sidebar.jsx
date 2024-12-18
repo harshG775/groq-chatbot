@@ -22,7 +22,7 @@ export default function Sidebar({ ...props }) {
     }, [setIsSidebarOpen]);
     return (
         <>
-            <div {...props} className={cn("z-50 flex flex-col", props.className)}>
+            <div {...props} className={cn("z-50 flex flex-col", props?.className)}>
                 <div className="p-2 flex justify-between min-h-10">
                     <div>
                         <Button
