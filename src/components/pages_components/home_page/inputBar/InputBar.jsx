@@ -4,7 +4,7 @@ import { Paperclip, SendHorizonal } from "lucide-react";
 export default function InputBar({ ...props }) {
     return (
         <div className={cn("", props?.className)}>
-            <div className="px-2 pb-2">
+            <div className="pl-2 pr-6 pb-2">
                 <textarea placeholder="Type your message..." className="border p-2 rounded w-full h-full" />
                 <div className="flex justify-between">
                     <div>

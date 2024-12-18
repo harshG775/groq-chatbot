@@ -1,6 +1,7 @@
 import Header from "@/components/pages_components/home_page/header/Header";
 import InputBar from "@/components/pages_components/home_page/inputBar/InputBar";
 import Sidebar from "@/components/pages_components/home_page/sidebar/Sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import useZustandStore from "@/store/zustand/useZustandStore";
 import { Outlet } from "react-router-dom";
 
@@ -21,9 +22,9 @@ export default function RootLayout() {
             >
                 <Header />
 
-                <div className="flex-1 overflow-auto">
+                <ScrollArea className="flex-1 p-2  //overflow-auto">
                     <Outlet />
-                </div>
+                </ScrollArea>
                 <InputBar />
             </div>
         </>

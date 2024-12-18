@@ -51,6 +51,7 @@ export default function Sidebar({ ...props }) {
                         <li className="min-h-56 border-2">Item 1</li>
                         <li className="min-h-56 border-2">Item 2</li>
                         <li className="min-h-56 border-2">Item 3</li>
+                        <li className="min-h-56 border-2">Item 4</li>
                     </ul>
                 </ScrollArea>
             </div>
