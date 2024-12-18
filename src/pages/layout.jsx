@@ -16,7 +16,7 @@ export default function RootLayout() {
             <Header />
             <div
                 className={`${
-                    isSidebarOpen ? "sm:ml-72" : "sm:ml-0"
+                    isSidebarOpen ? "md:ml-72" : "md:ml-0"
                 } transition-[margin-left] duration-300 ease-in-out `}
             >
                 <Outlet />

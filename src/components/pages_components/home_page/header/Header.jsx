@@ -8,7 +8,7 @@ export default function Header() {
         <div className="p-2 flex justify-between min-h-10">
             <div>
                 <Button
-                    className={`h-8 w-8 p-0 block ${isSidebarOpen ? "sm:invisible" : "sm:visible"}`}
+                    className={`h-8 w-8 p-0 block ${isSidebarOpen ? "md:invisible" : "md:visible"}`}
                     size="icon"
                     variant="ghost"
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}

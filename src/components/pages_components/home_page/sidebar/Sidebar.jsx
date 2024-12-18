@@ -7,7 +7,7 @@ import { useLayoutEffect } from "react";
 export default function Sidebar({ ...props }) {
     const { isSidebarOpen, setIsSidebarOpen } = useZustandStore((state) => state);
     useLayoutEffect(() => {
-        const mediaQuery = window.matchMedia("(min-width: 640px)");
+        const mediaQuery = window.matchMedia("(min-width: 768px)");
         const handleMediaQueryChange = (e) => {
             setIsSidebarOpen(e.matches);
         };
