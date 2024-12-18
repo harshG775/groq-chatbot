@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import useZustandStore from "@/store/zustand/useZustandStore";
 import { ChartNoAxesGantt, SquarePen } from "lucide-react";
@@ -6,8 +7,8 @@ export default function Sidebar({ ...props }) {
     const { isSidebarOpen, setIsSidebarOpen } = useZustandStore((state) => state);
     return (
         <>
-            <div {...props} className={cn("p-2 z-50", props.className)}>
-                <div className="flex justify-between">
+            <div {...props} className={cn("z-50 flex flex-col", props.className)}>
+                <div className="p-2 flex justify-between min-h-10">
                     <div>
                         <Button
                             className="h-8 w-8 p-0"
@@ -30,6 +31,13 @@ export default function Sidebar({ ...props }) {
                         </Button>
                     </div>
                 </div>
+                <ScrollArea className="h-full">
+                    <ul className="p-4 flex flex-col gap-2">
+                        <li className="min-h-56 border-2">Item 1</li>
+                        <li className="min-h-56 border-2">Item 2</li>
+                        <li className="min-h-56 border-2">Item 3</li>
+                    </ul>
+                </ScrollArea>
             </div>
             <div
                 className={`${

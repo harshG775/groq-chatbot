@@ -13,23 +13,22 @@ export default function RootLayout() {
                     isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 } transition-transform duration-300 ease-in-out`}
             />
-            <div
-                className={`${
-                    isSidebarOpen ? "sm:ml-72" : "sm:ml-0"
-                } transition-[margin-left] duration-300 ease-in-out p-2`}
-            >
-                <div className="flex justify-between min-h-16">
-                    <div>
-                        <Button
-                            className={`h-8 w-8 p-0 block ${isSidebarOpen ? "sm:hidden" : "sm:block"}`}
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        >
-                            <ChartNoAxesGantt />
-                        </Button>
-                    </div>
+            <div className="p-2 flex justify-between min-h-10">
+                <div>
+                    <Button
+                        className={`h-8 w-8 p-0 block ${isSidebarOpen ? "sm:invisible" : "sm:visible"}`}
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    >
+                        <ChartNoAxesGantt />
+                    </Button>
                 </div>
+            </div>
+            <div
+                className={`${isSidebarOpen ? "sm:ml-72" : "sm:ml-0"} transition-[margin-left] duration-300 ease-in-out
+                `}
+            >
                 <Outlet />
             </div>
         </>
