@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import useZustandStore from "@/store/zustand/useZustandStore";
 import { ChartNoAxesGantt, SquarePen } from "lucide-react";
 import { useLayoutEffect } from "react";
+import { Link } from "react-router-dom";
 export default function Sidebar({ ...props }) {
     const { isSidebarOpen, setIsSidebarOpen } = useZustandStore((state) => state);
     useLayoutEffect(() => {
@@ -36,13 +37,10 @@ export default function Sidebar({ ...props }) {
                     </div>
 
                     <div>
-                        <Button
-                            className="h-8 w-8 p-0"
-                            size={"icon"}
-                            variant="ghost"
-                            onClick={() => setIsSidebarOpen(false)}
-                        >
-                            <SquarePen />
+                        <Button className="h-8 w-8 p-0" size={"icon"} variant="ghost" asChild>
+                            <Link to="/">
+                                <SquarePen />
+                            </Link>
                         </Button>
                     </div>
                 </div>

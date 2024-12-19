@@ -9,7 +9,7 @@ export default function Header({ ...props }) {
         <div className={cn("p-2 flex justify-between", props?.className)}>
             <div>
                 <Button
-                    className={`h-8 w-8 p-0 block ${isSidebarOpen ? "md:invisible" : "md:visible"}`}
+                    className={`h-8 w-8 p-0 block ${isSidebarOpen ? "invisible" : "visible"}`}
                     size="icon"
                     variant="ghost"
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -19,7 +19,7 @@ export default function Header({ ...props }) {
             </div>
             <div>Groq ChatGPT</div>
             <div>
-                <Button className={`h-8 w-8 p-0 ${isSidebarOpen ? "md:invisible" : "md:visible"}`} size={"icon"} variant="ghost" onClick={() => setIsSidebarOpen(false)}>
+                <Button className={`h-8 w-8 p-0 ${isSidebarOpen ? "invisible" : "visible"}`} size={"icon"} variant="ghost" onClick={() => setIsSidebarOpen(false)}>
                     <SquarePen />
                 </Button>
             </div>
