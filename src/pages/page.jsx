@@ -1,43 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { createConversationHistory } from "@/queries/fetchRequest";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon, Paperclip, SendHorizonal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 export default function HomePage() {
-    const [creating, setCreating] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
-    const { data, isLoading, status, error, refetch } = useQuery({
-        queryKey: ["create-conversation-history"],
-        queryFn: ({ signal }) => createConversationHistory({ signal, data: {} }),
-        enabled: false,
-    });
     const queryClient = useQueryClient();
-    const handleCreateConversationHistory = () => {
-        setCreating(true);
-        refetch();
-    };
-    useEffect(() => {
-        if (status === "error") {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const handleCreateConversationHistory = async () => {
+        setIsLoading(true);
+        try {
+            const response = await createConversationHistory({ data: {} });
+            console.log("creating", response);
+
+            // queryClient.invalidateQueries(["conversation-history"]);
+            queryClient.setQueryData(["conversation-history"], (oldData) => [...oldData, response]);
+            navigate(`/conversation/${response?.id}`);
+        } catch (err) {
             toast({
                 variant: "destructive",
-                title: "Error",
-                description: error?.message || error?.response?.message,
+                title: "Error while creating conversation",
+                description: err?.message || err?.response?.message,
             });
+        } finally {
+            setIsLoading(false);
         }
-        if (status === "success") {
-            queryClient.invalidateQueries(["conversation-history"]).then(() => {
-                if (creating) {
-                    console.log("creating", data);
+    };
 
-                    queryClient.clear(["create-conversation-history"], () => null);
-                    navigate(`/conversation/${data?.id}`);
-                }
-            });
-        }
-    }, [status]);
     return (
         <div className="flex-1">
             <div className="h-full grid items-center mx-auto max-w-sm sm:max-w-xl ">
