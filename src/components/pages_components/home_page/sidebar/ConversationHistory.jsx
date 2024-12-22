@@ -56,7 +56,7 @@ function ConversationHistoryListItem({ item, paramsConversationId }) {
     const navigate = useNavigate();
     const { toast } = useToast();
     const { status, isLoading, error, refetch } = useQuery({
-        queryKey: ["conversation-history", item.id],
+        queryKey: ["delete-conversation-history", item.id],
         queryFn: ({ signal }) => deleteConversationHistoryById({ id: item.id, signal }),
         enabled: false,
     });

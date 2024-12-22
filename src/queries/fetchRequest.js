@@ -2,11 +2,11 @@ import { Fetch } from "@/utils/Fetch";
 
 const baseUrl = "https://onyx-ai-server.vercel.app/api/v1";
 const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1N2ZhZTYwLWY3MjctNGYyMC05MmM0LTUxOTk3MTI4MzM2OCIsIm5hbWUiOiJoYXJzaCIsImVtYWlsIjoiaGFyc2guMUBnbWFpbC5jb20iLCJ0eXBlIjoiQUNDRVNTIiwiaWF0IjoxNzM0ODUxMTAwLCJleHAiOjE3MzQ4NTQ3MDB9._-ZM1hlmyXJD5NC5Bb_4josnsnYoWKA8x48tZ1WhIZY"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1N2ZhZTYwLWY3MjctNGYyMC05MmM0LTUxOTk3MTI4MzM2OCIsIm5hbWUiOiJoYXJzaCIsImVtYWlsIjoiaGFyc2guMUBnbWFpbC5jb20iLCJ0eXBlIjoiQUNDRVNTIiwiaWF0IjoxNzM0ODU0NzcxLCJleHAiOjE3MzQ4NTgzNzF9.xNIqQqrc1HuKqOXbNm5DRXC35AQwW12MLS6z4XNx87U"
 
 // histories fetch request
-export const createConversationHistory = ({ signal, data }) => {
-    return Fetch(`${baseUrl}/histories`, {
+export const createConversationHistory = async ({ signal, data }) => {
+    const response = await Fetch(`${baseUrl}/histories`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -15,6 +15,8 @@ export const createConversationHistory = ({ signal, data }) => {
         body: JSON.stringify(data),
         signal,
     });
+    const respData = await response.json();
+    return respData.data.history;
 };
 export const fetchConversationHistories = async ({ signal }) => {
     const response = await Fetch(`${baseUrl}/histories`, {

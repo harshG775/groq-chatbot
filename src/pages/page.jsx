@@ -2,19 +2,21 @@ import { Button } from "@/components/ui/button";
 import { createConversationHistory } from "@/queries/fetchRequest";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon, Paperclip, SendHorizonal } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 export default function HomePage() {
+    const [creating, setCreating] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
-    const { isLoading, status, error, refetch } = useQuery({
+    const { data, isLoading, status, error, refetch } = useQuery({
         queryKey: ["create-conversation-history"],
         queryFn: ({ signal }) => createConversationHistory({ signal, data: {} }),
         enabled: false,
     });
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient();
     const handleCreateConversationHistory = () => {
+        setCreating(true);
         refetch();
     };
     useEffect(() => {
@@ -26,8 +28,14 @@ export default function HomePage() {
             });
         }
         if (status === "success") {
-            queryClient.invalidateQueries(["conversation-history"]);
-            navigate("/");
+            queryClient.invalidateQueries(["conversation-history"]).then(() => {
+                if (creating) {
+                    console.log("creating", data);
+
+                    queryClient.clear(["create-conversation-history"], () => null);
+                    navigate(`/conversation/${data?.id}`);
+                }
+            });
         }
     }, [status]);
     return (
