@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import useZustandStore from "@/store/zustand/useZustandStore";
 import { ChartNoAxesGantt, SquarePen } from "lucide-react";
 import { useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
+import ChatHistory from "./ConversationHistory";
 export default function Sidebar({ ...props }) {
     const { isSidebarOpen, setIsSidebarOpen } = useZustandStore((state) => state);
     useLayoutEffect(() => {
@@ -44,14 +44,7 @@ export default function Sidebar({ ...props }) {
                         </Button>
                     </div>
                 </div>
-                <ScrollArea className="h-full">
-                    <ul className="p-4 flex flex-col gap-2">
-                        <li className="min-h-56 border-2">Item 1</li>
-                        <li className="min-h-56 border-2">Item 2</li>
-                        <li className="min-h-56 border-2">Item 3</li>
-                        <li className="min-h-56 border-2">Item 4</li>
-                    </ul>
-                </ScrollArea>
+                <ChatHistory/>
             </div>
             <div
                 className={`${
