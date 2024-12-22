@@ -4,7 +4,7 @@ import { deleteConversationHistoryById, fetchConversationHistories } from "@/que
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Trash } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useEffect } from "react";
@@ -74,32 +74,37 @@ function ConversationHistoryListItem({ item, paramsConversationId }) {
                 title: "Success",
                 description: "Conversation history deleted successfully",
             });
-            navigate("/");
+            if (paramsConversationId === item.id) {
+                navigate("/");
+            }
         }
     }, [status]);
+
+    const handleDeleteConversationHistory = () => {
+        refetch();
+    };
     return (
-        <li>
-            <Link to={`/conversation/${item.id}`} asChild>
-                <Button
-                    variant={paramsConversationId === item.id ? "default" : "ghost"}
-                    className="w-full text-left flex justify-between items-center p-2"
-                    disabled={isLoading}
-                >
-                    <p className="flex-1 truncate max-w-52 mx-auto">
-                        {item.title}
-                        {item.title}
-                    </p>
-                    <Button
-                        onClick={refetch}
-                        variant={paramsConversationId === item.id ? "default" : "secondary"}
-                        size="icon"
-                        className="flex-shrink-0 h-8 w-8 grid"
-                        disabled={isLoading}
-                    >
-                        <Trash className="h-5 w-5" />
-                    </Button>
-                </Button>
-            </Link>
+        <li className="w-full text-left flex justify-between items-center ">
+            <Button
+                variant={paramsConversationId === item.id ? "default" : "ghost"}
+                disabled={isLoading}
+                onClick={() => navigate(`/conversation/${item.id}`)}
+                className="max-w-56 mx-0"
+            >
+                <p className="truncate">
+                    {item.title}
+                    {item.title}
+                </p>
+            </Button>
+            <Button
+                onClick={handleDeleteConversationHistory}
+                variant={"ghost"}
+                size="icon"
+                className="flex-shrink-0 grid text-destructive hover:text-destructive/80"
+                disabled={isLoading}
+            >
+                <Trash className="h-5 w-5" />
+            </Button>
         </li>
     );
 }
