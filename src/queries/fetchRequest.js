@@ -2,7 +2,7 @@ import { Fetch } from "@/utils/Fetch";
 
 const baseUrl = "https://onyx-ai-server.vercel.app/api/v1";
 const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1N2ZhZTYwLWY3MjctNGYyMC05MmM0LTUxOTk3MTI4MzM2OCIsIm5hbWUiOiJoYXJzaCIsImVtYWlsIjoiaGFyc2guMUBnbWFpbC5jb20iLCJ0eXBlIjoiQUNDRVNTIiwiaWF0IjoxNzM0ODQ2ODAyLCJleHAiOjE3MzQ4NTA0MDJ9.84cubuIJEMtwF60_LNEjGePJvWoH2W1JkIxhkLfdiKY";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU1N2ZhZTYwLWY3MjctNGYyMC05MmM0LTUxOTk3MTI4MzM2OCIsIm5hbWUiOiJoYXJzaCIsImVtYWlsIjoiaGFyc2guMUBnbWFpbC5jb20iLCJ0eXBlIjoiQUNDRVNTIiwiaWF0IjoxNzM0ODUxMTAwLCJleHAiOjE3MzQ4NTQ3MDB9._-ZM1hlmyXJD5NC5Bb_4josnsnYoWKA8x48tZ1WhIZY"
 
 // histories fetch request
 export const createConversationHistory = ({ signal, data }) => {

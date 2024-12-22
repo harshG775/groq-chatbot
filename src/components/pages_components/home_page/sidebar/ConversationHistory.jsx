@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { deleteConversationHistoryById, fetchConversationHistories } from "@/queries/fetchRequest";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { Trash } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,13 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useEffect } from "react";
 
 export default function ConversationHistory() {
-    const {
-        data,
-        isLoading,
-        isError,
-        error,
-        refetch: refetchConversationHistories,
-    } = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ["conversation-history"],
         queryFn: fetchConversationHistories,
     });
@@ -39,31 +34,25 @@ export default function ConversationHistory() {
                     </Alert>
                 </div>
             )}
-            {data && (
-                <ConversationHistoryList data={data} refetchConversationHistories={refetchConversationHistories} />
-            )}
+            {data && <ConversationHistoryList data={data} />}
         </ScrollArea>
     );
 }
 
-function ConversationHistoryList({ data, refetchConversationHistories }) {
+function ConversationHistoryList({ data }) {
     const params = useParams();
     return (
         <ul className="p-2 flex flex-col gap-1">
             {data.map((item) => (
-                <ConversationHistoryListItem
-                    key={item.id}
-                    item={item}
-                    paramsConversationId={params.conversationId}
-                    refetchConversationHistories={refetchConversationHistories}
-                />
+                <ConversationHistoryListItem key={item.id} item={item} paramsConversationId={params.conversationId} />
             ))}
         </ul>
     );
 }
 
-import { useToast } from "@/hooks/use-toast";
-function ConversationHistoryListItem({ item, paramsConversationId, refetchConversationHistories }) {
+function ConversationHistoryListItem({ item, paramsConversationId }) {
+    const queryClient = useQueryClient();
+
     const navigate = useNavigate();
     const { toast } = useToast();
     const { status, isLoading, error, refetch } = useQuery({
@@ -80,7 +69,7 @@ function ConversationHistoryListItem({ item, paramsConversationId, refetchConver
             });
         }
         if (status === "success") {
-            refetchConversationHistories();
+            queryClient.invalidateQueries(["conversation-history"]);
             toast({
                 title: "Success",
                 description: "Conversation history deleted successfully",
