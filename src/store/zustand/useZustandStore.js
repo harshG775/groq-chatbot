@@ -14,6 +14,16 @@ const useZustandStore = create()(
         // Sidebar state
         isSidebarOpen: false,
         setIsSidebarOpen: createUpdater(set, "isSidebarOpen"),
+
+        // Chat state
+        contentStream: { content: "", status: "idle" },
+        setContentStream: (newState) => {
+            set(() => {
+                return {
+                    contentStream: newState,
+                };
+            });
+        },
     }))
 );
 

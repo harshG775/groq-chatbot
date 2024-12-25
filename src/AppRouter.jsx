@@ -6,6 +6,7 @@ import Loading from "./pages/loading";
 import Providers from "./components/providers/Providers";
 import NotFound from "./pages/not-found";
 import ConversationPage from "./pages/conversation/[conversationId]/page";
+import TestPage from "./pages/test/page";
 
 const router = createBrowserRouter([
     {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
                 element: <ConversationPage />,
             },
         ],
+    },
+    {
+        path: "/test",
+        element: <TestPage />,
     },
     {
         path: "*",
