@@ -1,153 +1,219 @@
-// // Default
-// import Groq from "groq-sdk";
-
-// const groq = new Groq({
-//     apiKey: "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",
-//     dangerouslyAllowBrowser: true,
-// });
-
-// const runConversation = async ({ userPrompt }) => {
-//     const MODEL = "llama3-groq-70b-8192-tool-use-preview";
-
-//     const systemPrompt = `
-//     You are a query suggestion assistant. When provided with a user query, generate an array of related queries.
-//     Use the "generate_query_suggestions" tool. Avoid responding directly in text.
-//     `;
-
-//     const tools = [
-//         {
-//             type: "function",
-//             function: {
-//                 name: "generate_query_suggestions",
-//                 description: "A function to generate multiple related queries for a given user input. This tool must be used when the user provides a query.",
-//                 parameters: {
-//                     type: "object",
-//                     properties: {
-//                         expression: {
-//                             type: "array",
-//                             items: {
-//                                 type: "string",
-//                             },
-//                         },
-//                     },
-//                     required: ["expression"],
-//                 },
-//             },
-//         },
-//     ];
-
-//     const messages = [
-//         { role: "system", content: systemPrompt },
-//         { role: "user", content: userPrompt },
-//     ];
-
-//     try {
-//         const response = await groq.chat.completions.create({
-//             model: MODEL,
-//             messages: messages,
-//             stream: false,
-//             tools: tools,
-//             // tool_choice: "auto",
-//             max_tokens: 4096,
-//         });
-
-//         const responseMessage = response.choices[0].message;
-//         console.log("Response Message: ", responseMessage);
-
-//         // if (responseMessage.tool_calls?.length > 0) {
-//         //     const suggestions = responseMessage.tool_calls[0].parameters.suggestedQueries;
-//         //     console.log("Suggested Queries: ", suggestions);
-//         //     return suggestions;
-//         // } else {
-//         //     console.error("No tool calls detected.");
-//         //     return [];
-//         // }
-//     } catch (error) {
-//         console.error("Error in conversation: ", error);
-//         return [];
-//     }
-// };
+// import { Button } from "@/components/ui/button";
+// import { Mic, MicOff } from "lucide-react";
+// import { useCallback, useEffect, useRef, useState } from "react";
 
 // export default function TestPage() {
+//     const [isListening, setIsListening] = useState(false);
+//     const [errorListening, setErrorListening] = useState(null);
+//     const recognitionRef = useRef(null);
+//     const [isLoading, setIsLoading] = useState(false);
+//     const [transcript, setTranscript] = useState("");
+
+//     const simulateResponse = async () => {
+//         setIsLoading(true);
+//         await new Promise((resolve) => setTimeout(resolve, 1000));
+//         setIsLoading(false);
+//         console.log(transcript);
+//         setTranscript("");
+//     };
+
+//     const startListening = () => {
+//         // Check if speech recognition is supported
+//         const hasRecognitionSupport = "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
+//         if (!hasRecognitionSupport) {
+//             alert("Speech recognition is not supported in this browser.");
+//             return;
+//         }
+
+//         // Create an instance of SpeechRecognition
+//         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+//         recognitionRef.current = new SpeechRecognition();
+
+//         // Apply options
+//         recognitionRef.current.lang = "en-US"; // Set language (default to English)
+//         recognitionRef.current.continuous = true; // Continuous recognition
+//         recognitionRef.current.interimResults = false; // Interim results
+//         recognitionRef.current.maxAlternatives = 1; // Number of alternatives
+
+//         // Define event handlers
+//         recognitionRef.current.onstart = () => {
+//             console.log("Speech recognition started.");
+//         };
+
+//         recognitionRef.current.onend = () => {
+//             console.log("Speech recognition ended.");
+//             setIsListening(false);
+//         };
+
+//         recognitionRef.current.onspeechstart = () => {
+//             console.log("Speech detected.");
+//         };
+
+//         recognitionRef.current.onspeechend = () => {
+//             console.log("Speech has stopped.");
+//         };
+
+//         let debounceTimer;
+//         recognitionRef.current.onresult = (event) => {
+//             // console.log(result?.[event.results.length - 1]?.transcript);
+//             // console.log(event.results[event.results.length - 1]);
+//             let finalTranscript = "";
+//             for (let i = 0; i < event.results.length; i++) {
+//                 finalTranscript += event.results[i][0].transcript;
+//             }
+//             console.log(finalTranscript);
+
+//             // clearTimeout(debounceTimer);
+//             // debounceTimer = setTimeout(() => {
+//             //     if (isLoading) {
+//             //         return;
+//             //     }
+
+//             //     console.log("Speech recognition result:", );
+//             //     simulateResponse(event);
+//             // }, 200);
+//         };
+
+//         recognitionRef.current.onerror = (event) => {
+//             const errorMessages = {
+//                 network: "A network error occurred.",
+//                 "no-speech": "No speech was detected.",
+//                 "not-allowed": "Microphone access was denied.",
+//                 aborted: "Speech recognition was aborted.",
+//                 "audio-capture": "No microphone was found or microphone is not working.",
+//                 "service-not-allowed": "Speech recognition service is not allowed.",
+//                 "bad-grammar": "Speech grammar error occurred.",
+//                 "language-not-supported": "Selected language is not supported.",
+//             };
+//             const errorMessage =
+//                 errorMessages[event.error] || "An unknown error occurred with speech recognitionRef.current.";
+//             console.error(errorMessage);
+//         };
+
+//         recognitionRef.current.onnomatch = () => {
+//             console.log("No speech match found.");
+//         };
+
+//         // Start recognition
+//         recognitionRef.current.start();
+//         setIsListening(true);
+//     };
+//     const stopListening = useCallback(() => {
+//         setErrorListening(null); // Reset error on stop
+//         try {
+//             if (recognitionRef.current && isListening) {
+//                 recognitionRef.current.stop();
+//                 setIsListening(false);
+//             }
+//         } catch (err) {
+//             console.error("Speech Recognition stop error:", err);
+//             setIsListening(false);
+//         }
+//     }, [isListening]);
+
+//     useEffect(() => {}, []);
 //     return (
-//         <div>
-//             <button onClick={() => runConversation({ userPrompt: "how to create counter in reactjs" })}>call</button>
+//         <div className="p-4 space-y-4">
+//             {errorListening && <div>{errorListening}</div>}
+//             <div>{isListening ? "Listening" : "Not listening"}</div>
+//             <div>
+//                 {isListening ? (
+//                     <Button onClick={stopListening}>
+//                         <MicOff />
+//                     </Button>
+//                 ) : (
+//                     <Button onClick={startListening} variant={"outline"}>
+//                         <Mic />
+//                     </Button>
+//                 )}
+//             </div>
 //         </div>
 //     );
 // }
 
 import { Button } from "@/components/ui/button";
-import useZustandStore from "@/store/zustand/useZustandStore";
-import { catchError } from "@/utils/catchError";
-import Groq from "groq-sdk";
-import { MessageCircleMore, TextCursor } from "lucide-react";
-const groq = new Groq({
-    apiKey: "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",
-    dangerouslyAllowBrowser: true,
-});
+import useSpeechRecognition from "@/hooks/useSpeechRecognition";
+import { useCallback, useRef, useState } from "react";
 
 export default function TestPage() {
-    const setContentStream = useZustandStore((state) => state.setContentStream);
+    const [isLoading, setIsLoading] = useState(false);
+    const [messages, setMessages] = useState([]);
 
-    const handleSend = async () => {
-        setContentStream({ content: "", status: "streaming" });
-        await delay(2000);
-        const [error, stream] = await catchError(
-            groq.chat.completions.create({
-                model: "llama3-70b-8192",
-                messages: [{ role: "user", content: "how to create counter in reactjs" }],
-                stream: true,
-            })
-        );
-        if (error) {
-            console.log(error);
-            return;
-        }
-        let accumulated = "";
-        for await (const chunk of stream) {
-            accumulated += chunk.choices[0].delta.content || "";
-            setContentStream({ content: accumulated, status: "streaming" });
-            await delay(10);
-        }
-        setContentStream({ content: accumulated, status: "completed" });
+    const simulateResponse = async (transcript) => {
+        console.log(transcript);
+        setIsLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setMessages((prevMessages) => [...prevMessages, transcript]);
+        setIsLoading(false);
     };
+
+    //
+    const debounceTimerRef = useRef(null);
+    const [isListening, setIsListening] = useState(false);
+
+    const { error, recognitionRef } = useSpeechRecognition({
+        continuous: true,
+        interimResults: true,
+        language: "en-IN",
+        handlers: {
+            onResult: (event) => {
+                if (isLoading) {
+                    return;
+                }
+                console.log("before");
+                clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = setTimeout(() => {
+                    const resultTranscript = event.results?.[event.results.length - 1];
+                    if (resultTranscript?.isFinal) {
+                        let finalTranscript = resultTranscript?.[0].transcript;
+                        simulateResponse(finalTranscript);
+                    }
+                }, 1000);
+            },
+            onEnd: () => {
+                console.log("Speech recognition ended.");
+                setIsListening(false);
+            },
+            onStart: () => {
+                setIsListening(true);
+                console.log("Speech recognition started.");
+            },
+            onError: (error) => {
+                setIsListening(false);
+                console.error("Speech Recognition error:", error);
+            },
+        },
+    });
+
+    const startListening = useCallback(() => {
+        if (recognitionRef.current && !isListening) {
+            recognitionRef.current.start();
+        }
+    }, [recognitionRef, isListening]);
+
+    const stopListening = useCallback(() => {
+        if (recognitionRef.current && isListening) {
+            recognitionRef.current.stop();
+        }
+    }, [recognitionRef, isListening]);
+
     return (
         <div>
-            <div className="sticky top-0 bg-background">
-                <h1>test page</h1>
-                <Button onClick={handleSend}>send</Button>
+            <div>
+                {error && <div>{error.message}</div>}
+                <div>{isListening ? "Listening" : "Not listening"}</div>
+                <Button onClick={startListening} variant={"outline"}>
+                    start
+                </Button>
+                <Button onClick={stopListening}>Stop</Button>
             </div>
-            <TestPage_nested />
+
+            <div>
+                <div>{isLoading ? "Loading..." : "Not loading"}</div>
+                {messages?.map((message, i) => (
+                    <div key={message + i}>{message}</div>
+                ))}
+            </div>
         </div>
     );
 }
-
-function TestPage_nested() {
-    const { content, status } = useZustandStore((state) => state.contentStream);
-
-    // Function to split content
-    const getFadedContent = (text) => {
-        if (!text) return { mainText: "", fadedText: "" };
-        const mainText = text.slice(0, -10); // All except the last 10 characters
-        const fadedText = text.slice(-10); // Last 10 characters
-        return { mainText, fadedText };
-    };
-
-    const { mainText, fadedText } = getFadedContent(content);
-
-    return (
-        <div className="p-8">
-            <h1 className="text-2xl">test stream:</h1>
-            {status === "streaming" && (
-                <div>
-                    {mainText}
-                    <span className="text-gray-500 opacity-70">{fadedText}</span>
-                    <TextCursor className="inline-flex ml-2 animate-bounce text-primary" />
-                </div>
-            )}
-            {status === "completed" && <div>{content}</div>}
-        </div>
-    );
-}
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
