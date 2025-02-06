@@ -20,9 +20,10 @@ import { useModelsContext } from "@/store/context/Models-context";
 function ModelsSelector() {
     const { models, currentModel, setCurrentModel } = useModelsContext();
 
+    const arrayModels = Object.entries(models);
     return (
         <Select
-            value={currentModel}
+            value={currentModel || arrayModels?.[0]?.[1]?.[0]}
             onValueChange={(value) => {
                 setCurrentModel(value);
             }}
@@ -31,7 +32,7 @@ function ModelsSelector() {
                 <SelectValue placeholder="Select AI Model" />
             </SelectTrigger>
             <SelectContent>
-                {Object.entries(models).map(([owner, models]) => (
+                {arrayModels.map(([owner, models]) => (
                     <SelectGroup key={owner}>
                         <SelectLabel>{owner}</SelectLabel>
                         {models.map((model) => (
