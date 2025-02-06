@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { getGroqChatCompletion } from "@/services/groq/groq.ai";
 import { useMessagesContext } from "@/store/context/Messages-context";
 import { useStreamingMessageContext } from "@/store/context/StreamingMessage-context";
+import { useModelsContext } from "@/store/context/Models-context";
 
 export default function InputArea({ className, ...props }) {
     const { setStreamingMessage } = useStreamingMessageContext();
@@ -13,6 +14,7 @@ export default function InputArea({ className, ...props }) {
 
     const [inputValue, setInputValue] = useState("");
     const abortControllerRef = useRef(null);
+    const { currentModel } = useModelsContext();
 
     // handles for request
     const handleQuery = async () => {
@@ -28,7 +30,12 @@ export default function InputArea({ className, ...props }) {
             setIsProcessing(true);
             // stream
             abortControllerRef.current = new AbortController();
-            const stream = await getGroqChatCompletion(messages, inputValue, abortControllerRef.current.signal);
+            const stream = await getGroqChatCompletion(
+                messages,
+                inputValue,
+                abortControllerRef.current.signal,
+                currentModel
+            );
             setInputValue("");
             for await (const chunk of stream) {
                 accumulatedStreamContent += chunk.choices[0]?.delta?.content || "";

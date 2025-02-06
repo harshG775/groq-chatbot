@@ -1,15 +1,15 @@
 //how to write function call in groq api with streaming enabled
 
-
 import Groq from "groq-sdk";
 import systemMessages from "./systemMessages";
+import { to } from "@/utils/to";
 const apiKey = import.meta.env.VITE_GROQ_API_KEY;
 export const groq = new Groq({
     dangerouslyAllowBrowser: true,
     apiKey: apiKey,
 });
 
-export const getGroqChatCompletion = async (messages, inputValue, signal) => {
+export const getGroqChatCompletion = async (messages, inputValue, signal, model) => {
     return groq.chat.completions.create(
         {
             messages: [
@@ -23,7 +23,7 @@ export const getGroqChatCompletion = async (messages, inputValue, signal) => {
                     content: inputValue,
                 },
             ],
-            model: "llama-3.1-70b-versatile",
+            model: model,
             // max_tokens: 500,
             stream: true,
         },
@@ -31,4 +31,9 @@ export const getGroqChatCompletion = async (messages, inputValue, signal) => {
             signal: signal,
         }
     );
+};
+
+export const getModel = async () => {
+    return to(groq.models.list());
+
 };
