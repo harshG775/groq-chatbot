@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { codeGenerator } from "@/services/groq/codeGenerator";
 import { queryClassifier } from "@/services/groq/queryClassifier";
 import { useState } from "react";
 
@@ -20,8 +21,8 @@ export default function HomePage() {
     return (
         <div>
             <h1></h1>
-            {/* <Button onClick={()=>codeGenerator("reactjs counter")}>codeGenerator</Button> */}
-            <Button onClick={handleFetch}>queryClassifier(reactjs counter)</Button>
+            <Button onClick={()=>codeGenerator("reactjs counter")}>codeGenerator</Button>
+            {/* <Button onClick={handleFetch}>queryClassifier(reactjs counter)</Button> */}
             <textarea
                 placeholder="enter your query"
                 className="query-input"

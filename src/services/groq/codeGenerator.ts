@@ -1,3 +1,8 @@
+/**
+ * https://github.com/vgulerianb/react-exe
+ * https://react-exe-demo.vercel.app/
+ * ! need to sandbox it
+*/
 import { groqClient } from ".";
 
 export async function codeGenerator(userPrompt: string) {

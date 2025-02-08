@@ -76,3 +76,7 @@ body {
         @apply bg-background text-foreground;
     }
 }
+
+.scrollbar-color {
+    scrollbar-color: hsla(var(--foreground)) hsl(var(--background));
+}
