@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Expand, Minimize, UserCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -12,9 +13,13 @@ export default function ConversationPage() {
             <div className={`fixed inset-0  flex flex-col`}>
                 <header className="flex justify-between w-full p-4">
                     <div className="font-semibold">HEADER</div>
-                    <Button size={"icon"} variant={"ghost"} className="h-8 w-8">
-                        <UserCircle />
-                    </Button>
+                    <div>
+                        <ModeToggle className="rounded-full" />
+
+                        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+                            <UserCircle />
+                        </Button>
+                    </div>
                 </header>
                 <main className="overflow-auto scrollbar-color px-4">
                     <div className="max-w-6xl mx-auto">
@@ -30,7 +35,7 @@ export default function ConversationPage() {
                         >
                             <div className="flex justify-between items-center w-full">
                                 <div className="p-2">
-                                    <Button variant={"ghost"} className="h-8 rounded-r-none">
+                                    <Button variant={"ghost"} className="h-8 rounded-r-none ">
                                         preview
                                     </Button>
                                     <Button variant={"ghost"} className="h-8 rounded-l-none border">
@@ -41,6 +46,7 @@ export default function ConversationPage() {
                                     size={"icon"}
                                     variant={"ghost"}
                                     onClick={() => setIsFullScreenPreview((prev) => !prev)}
+                                    className="mr-1"
                                 >
                                     {isFullScreenPreview ? <Minimize /> : <Expand />}
                                 </Button>
