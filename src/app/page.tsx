@@ -1,87 +1,37 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { groqClient } from "@/services/groq";
+import { queryClassifier } from "@/services/groq/queryClassifier";
+import { useState } from "react";
 
 export default function HomePage() {
+    const [classification, setClassification] = useState("");
+    const [userPrompt, setUserPrompt] = useState("");
     const handleFetch = async () => {
-        const systemPrompt = `
-      You are an expert React developer using Vite and Tailwind CSS. Your task is to generate React code based on user requests.
-      
-      Rules:
-      1. Use functional components
-      2. Export components as default
-      3. Use Tailwind classes for styling
-      4. Keep components focused and modular
-      5. Use ES6+ syntax
-      6. Add PropTypes for component validation
-      7. Use named exports for utilities
-      8. Follow standard directory structure
-      
-      Always use the generate_react_code tool to provide your response.
-      `;
-        const response = await groqClient.chat.completions.create({
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: "create Button component and use it in the Counter component" },
-            ],
-            model: "deepseek-r1-distill-llama-70b",
-            tools: [
-                {
-                    type: "function",
-                    function: {
-                        name: "generate_react_code",
-                        description:
-                            "Generates React code for a given component or feature using Vite and Tailwind CSS.",
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                components: {
-                                    type: "array",
-                                    items: {
-                                        type: "object",
-                                        properties: {
-                                            name: {
-                                                type: "string",
-                                                description: "The name of the React component",
-                                            },
-                                            path: {
-                                                type: "string",
-                                                description:
-                                                    "The file path where the component should be saved (e.g., src/components/Button.jsx)",
-                                            },
-                                            code: {
-                                                type: "string",
-                                                description: "The React code for the component",
-                                            },
-                                        },
-                                        required: ["name", "path", "code"],
-                                    },
-                                },
-                                dependencies: {
-                                    type: "array",
-                                    items: {
-                                        type: "string",
-                                        description: "List of npm packages required for the generated code",
-                                    },
-                                },
-                            },
-                            required: ["components"],
-                        },
-                    },
-                },
-            ],
-            tool_choice: "auto",
-        });
-        const message = response.choices[0].message;
-        console.log(message.reasoning);
-        if (message.tool_calls) {
-            console.log(JSON.parse(message.tool_calls[0].function.arguments));
+        if (!userPrompt) {
+            return;
+        }
+        setClassification("");
+        const response = await queryClassifier(userPrompt);
+        if (response?.classification) {
+            setClassification(response.classification);
+            console.log(response.classification);
         }
     };
     return (
         <div>
             <h1></h1>
-            <Button onClick={handleFetch}>Call</Button>
+            {/* <Button onClick={()=>codeGenerator("reactjs counter")}>codeGenerator</Button> */}
+            <Button onClick={handleFetch}>queryClassifier(reactjs counter)</Button>
+            <textarea
+                placeholder="enter your query"
+                className="query-input"
+                value={userPrompt}
+                onChange={(e) => setUserPrompt(e.target.value)}
+            ></textarea>
+            <div>
+                classification:
+                <div className="inline-block font-bold">{classification}</div>
+            </div>
         </div>
     );
 }
