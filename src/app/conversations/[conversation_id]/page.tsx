@@ -6,46 +6,64 @@ import { useState } from "react";
 
 export default function ConversationPage() {
     const params = useParams();
-    const [isFullScreenPreview, setIsFullScreenPreview] = useState(true);
+    const [isFullScreenPreview, setIsFullScreenPreview] = useState(false);
     return (
         <>
-            <div className={`${isFullScreenPreview ? "select-none" : ""} fixed inset-0 w-1/2  flex flex-col`}>
+            <div className={`fixed inset-0  flex flex-col`}>
                 <header className="flex justify-between w-full p-4">
                     <div className="font-semibold">HEADER</div>
-                    <Button variant={"ghost"}>
+                    <Button size={"icon"} variant={"ghost"} className="h-8 w-8">
                         <UserCircle />
                     </Button>
                 </header>
-                <main className="overflow-auto scrollbar-color">
-                    <ul>
-                        {Array.from({ length: 200 }, (_: any, i: number) => (
-                            <li key={i}>Conversation</li>
-                        ))}
-                    </ul>
+                <main className="overflow-auto scrollbar-color px-4">
+                    <div className="max-w-6xl mx-auto">
+                        <ul>
+                            {Array.from({ length: 10 }, (_: any, i: number) => (
+                                <li key={i}>Conversation</li>
+                            ))}
+                        </ul>
+                        <div
+                            className={` ${
+                                isFullScreenPreview ? "fixed inset-0" : "h-[28rem] rounded-lg mt-16 mb-8"
+                            }  bg-secondary border-x overflow-hidden flex flex-col`}
+                        >
+                            <div className="flex justify-between items-center w-full">
+                                <div className="p-2">
+                                    <Button variant={"ghost"} className="h-8 rounded-r-none">
+                                        preview
+                                    </Button>
+                                    <Button variant={"ghost"} className="h-8 rounded-l-none border">
+                                        code
+                                    </Button>
+                                </div>
+                                <Button
+                                    size={"icon"}
+                                    variant={"ghost"}
+                                    onClick={() => setIsFullScreenPreview((prev) => !prev)}
+                                >
+                                    {isFullScreenPreview ? <Minimize /> : <Expand />}
+                                </Button>
+                            </div>
+                            <div className="overflow-auto scrollbar-color">
+                                <ul className="px-2">
+                                    {Array.from({ length: 100 }, (_: any, i: number) => (
+                                        <li key={i}>CODE BLOCK</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                        <ul>
+                            {Array.from({ length: 100 }, (_: any, i: number) => (
+                                <li key={i}>Conversation</li>
+                            ))}
+                        </ul>
+                    </div>
                 </main>
                 <div className="bg-secondary">
                     <div className="p-4">
                         <textarea name="userPrompt" id="" className="w-full"></textarea>
                     </div>
-                </div>
-            </div>
-            <div
-                className={`${
-                    isFullScreenPreview ? "fixed inset-0" : "fixed right-0 top-0 bottom-0 w-1/2"
-                }    flex flex-col bg-background`}
-            >
-                <div className="flex justify-between w-full p-4">
-                    <div>code/preview</div>
-                    <Button variant={"ghost"} onClick={() => setIsFullScreenPreview((prev) => !prev)}>
-                        {isFullScreenPreview ? <Minimize /> : <Expand />}
-                    </Button>
-                </div>
-                <div className="overflow-auto scrollbar-color">
-                    <ul>
-                        {Array.from({ length: 200 }, (_: any, i: number) => (
-                            <li key={i}>code block</li>
-                        ))}
-                    </ul>
                 </div>
             </div>
         </>
