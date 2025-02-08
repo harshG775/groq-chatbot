@@ -1,9 +1,36 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { Expand, Minimize, UserCircle } from "lucide-react";
+import { Expand, Minimize, Plus, SendHorizonal, UserCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+
+function InputBar() {
+    const [userPrompt, setUserPrompt] = useState("");
+    return (
+        <div className="w-full">
+            <div className="pb-3 space-y-1 max-w-[73rem] pr-4 mx-auto">
+                <div className="bg-secondary p-2 rounded-2xl focus:border-none">
+                    <textarea
+                        name="userPrompt"
+                        placeholder="Message"
+                        className="bg-secondary w-full rounded-2xl h-10 min-h-10 max-h-48 p-2"
+                        value={userPrompt}
+                        onChange={(e) => setUserPrompt(e.target.value)}
+                    ></textarea>
+                    <div className="flex justify-between items-center">
+                        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+                            <Plus />
+                        </Button>
+                        <Button size={"icon"} variant={"ghost"} className="rounded-full">
+                            <SendHorizonal />
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default function ConversationPage() {
     const params = useParams();
@@ -24,7 +51,7 @@ export default function ConversationPage() {
                 <main className="overflow-auto scrollbar-color px-4">
                     <div className="max-w-6xl mx-auto">
                         <ul>
-                            {Array.from({ length: 10 }, (_: any, i: number) => (
+                            {Array.from({ length: 30 }, (_: any, i: number) => (
                                 <li key={i}>Conversation</li>
                             ))}
                         </ul>
@@ -66,11 +93,7 @@ export default function ConversationPage() {
                         </ul>
                     </div>
                 </main>
-                <div className="bg-secondary">
-                    <div className="p-4">
-                        <textarea name="userPrompt" id="" className="w-full"></textarea>
-                    </div>
-                </div>
+                <InputBar />
             </div>
         </>
     );
