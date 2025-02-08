@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { groqClient } from "@/services/groq";
 
 export default function HomePage() {
@@ -80,7 +81,7 @@ export default function HomePage() {
     return (
         <div>
             <h1></h1>
-            <button onClick={handleFetch}>Call</button>
+            <Button onClick={handleFetch}>Call</Button>
         </div>
     );
 }
