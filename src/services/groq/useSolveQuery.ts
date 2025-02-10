@@ -44,6 +44,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
         });
         let accumulated = "";
         for await (const chunk of stream) {
+            // stop
             if (chunk.choices[0].finish_reason === "stop") {
                 const newAssistantMessageId = crypto.randomUUID();
                 setMessages((prev) => [
@@ -56,9 +57,15 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
                     },
                 ]);
                 accumulated = "";
+                setStreamMessage({
+                    content: accumulated,
+                    streaming: false,
+                });
             }
+            // start
             setStreamMessage({
                 content: accumulated,
+                streaming: true,
             });
             accumulated += chunk?.choices?.[0]?.delta?.content || "";
         }

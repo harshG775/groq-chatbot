@@ -2,6 +2,7 @@ import { create, devtools } from ".";
 
 export type StreamMessage = {
     content: string;
+    streaming: boolean;
 };
 
 interface StreamMessageStoreState {
@@ -13,6 +14,7 @@ export const useStreamMessageStore = create<StreamMessageStoreState>()(
     devtools((set) => ({
         streamMessage: {
             content: "string",
+            streaming: false,
         },
         setStreamMessage: (newState) => {
             return set((prevState) => ({
