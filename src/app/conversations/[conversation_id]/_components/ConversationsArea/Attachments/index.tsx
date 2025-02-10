@@ -9,8 +9,8 @@ function CodeAttachment() {
     return (
         <div
             className={` ${
-                isFullScreenPreview ? "fixed inset-0" : "h-[28rem] rounded-lg mt-16 mb-8"
-            }  bg-secondary border-x overflow-hidden flex flex-col`}
+                isFullScreenPreview ? "fixed inset-0" : "h-[28rem] rounded-lg"
+            }  bg-secondary/80 border-x overflow-hidden flex flex-col`}
         >
             <div className="flex justify-between items-center w-full">
                 <div className="p-2">
