@@ -8,9 +8,9 @@ import { useState } from "react";
 function InputBar() {
     const [userPrompt, setUserPrompt] = useState("");
     return (
-        <div className="w-full">
-            <div className="pb-3 space-y-1 max-w-[73rem] pr-4 mx-auto">
-                <div className="bg-secondary p-2 rounded-2xl focus:border-none">
+        <div className="w-full px-2">
+            <div className="pb-4 space-y-1 max-w-[74rem] pr-4 mx-auto">
+                <div className="bg-secondary p-2 rounded-xl focus:border-none">
                     <textarea
                         name="userPrompt"
                         placeholder="Message"
@@ -39,7 +39,7 @@ export default function ConversationPage() {
         <>
             <div className={`fixed inset-0  flex flex-col`}>
                 <header className="flex justify-between w-full p-4">
-                    <div className="font-semibold">HEADER</div>
+                    <div className="font-semibold">HEADER {params.conversation_id}</div>
                     <div>
                         <ModeToggle className="rounded-full" />
 
@@ -51,7 +51,7 @@ export default function ConversationPage() {
                 <main className="overflow-auto scrollbar-color px-4">
                     <div className="max-w-6xl mx-auto">
                         <ul>
-                            {Array.from({ length: 30 }, (_: any, i: number) => (
+                            {Array.from({ length: 30 }, (_, i: number) => (
                                 <li key={i}>Conversation</li>
                             ))}
                         </ul>
@@ -80,14 +80,14 @@ export default function ConversationPage() {
                             </div>
                             <div className="overflow-auto scrollbar-color">
                                 <ul className="px-2">
-                                    {Array.from({ length: 100 }, (_: any, i: number) => (
+                                    {Array.from({ length: 100 }, (_, i: number) => (
                                         <li key={i}>CODE BLOCK</li>
                                     ))}
                                 </ul>
                             </div>
                         </div>
                         <ul>
-                            {Array.from({ length: 100 }, (_: any, i: number) => (
+                            {Array.from({ length: 100 }, (_, i: number) => (
                                 <li key={i}>Conversation</li>
                             ))}
                         </ul>
