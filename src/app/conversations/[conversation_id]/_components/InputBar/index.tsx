@@ -1,16 +1,22 @@
 "use client";
 import { AutosizeTextarea } from "@/components/ui/AutosizeTextareaDemo";
 import { Button } from "@/components/ui/button";
+import useSolveQuery from "@/services/groq/useSolveQuery";
 import { useUserPromptStore } from "@/store/zustand";
 import { Plus, SendHorizonal } from "lucide-react";
 
 export default function InputBar() {
     const userPrompt = useUserPromptStore((state) => state.userPrompt);
     const setUserPrompt = useUserPromptStore((state) => state.setUserPrompt);
-    const handleSubmit = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const { solveQuery } = useSolveQuery({ userPrompt });
+
+    const handleSubmit = async () => {
+        await solveQuery();
+    };
+    const handleOnKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            console.log("handleSubmit()");
+            handleSubmit();
         }
     };
     return (
@@ -25,14 +31,14 @@ export default function InputBar() {
                         minHeight={30}
                         value={userPrompt}
                         onChange={(e) => setUserPrompt(e.target.value)}
-                        onKeyDown={handleSubmit}
+                        onKeyDown={handleOnKeyDown}
                     />
                     <div className="flex mt-2 justify-between items-center">
                         <Button size={"icon"} variant={"ghost"} className="rounded-full">
                             <Plus />
                         </Button>
                         <Button size={"icon"} variant={"ghost"} className="rounded-full">
-                            <SendHorizonal />
+                            <SendHorizonal onClick={handleSubmit} />
                         </Button>
                     </div>
                 </div>
