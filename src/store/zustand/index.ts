@@ -1,6 +1,6 @@
-import { create } from "zustand";
+"use client";
+export { create } from "zustand";
+export { devtools, persist } from "zustand/middleware";
 
-export const useStore = create((set) => ({
-    bears: 0,
-    updateBears: (newBears: number) => set({ bears: newBears }),
-}));
+// stores
+export * from "./messages";
