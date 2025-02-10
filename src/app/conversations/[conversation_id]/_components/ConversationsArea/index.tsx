@@ -1,33 +1,43 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useMessagesStore } from "@/store/zustand";
-import Attachments from "./Attachments";
+import { Bot } from "lucide-react";
+// import Attachments from "./Attachments";
+import { Fragment } from "react";
 
 export default function ConversationsArea() {
     const messages = useMessagesStore((state) => state.messages);
     // const setMessages = useMessagesStore((state) => state.setMessages);
 
     return (
-        <main className="overflow-auto scrollbar-color px-2">
+        <main className="overflow-auto scrollbar-color">
             <div className="max-w-6xl mx-auto">
-                <ul>
+                <div className="flex flex-col">
                     {messages?.map((message) => (
-                        <li key={message?.id}>
+                        <Fragment key={message?.id}>
                             {message?.role === "user" && (
-                                <div>
-                                    <div>User</div>
-                                    <div>{message.content}</div>
+                                <div className="mb-12 self-end">
+                                    <div className="bg-primary max-w-max p-2 rounded-xl">
+                                        <div>{message.content}</div>
+                                    </div>
                                 </div>
                             )}
                             {message?.role === "assistant" && (
-                                <div>
-                                    <div>assistant</div>
-                                    <div>{message.content}</div>
+                                <div className="mb-12 self-auto">
+                                    <div>
+                                        <Button variant={"ghost"} size={"icon"}>
+                                            <Bot />
+                                        </Button>
+                                    </div>
+                                    <div className="bg-secondary/20 p-2 rounded-xl">
+                                        <div>{message.content}</div>
+                                    </div>
                                 </div>
                             )}
-                            {message?.attachments && <Attachments message={message} />}
-                        </li>
+                            {/* {message?.attachments && <Attachments message={message} />} */}
+                        </Fragment>
                     ))}
-                </ul>
+                </div>
             </div>
         </main>
     );
