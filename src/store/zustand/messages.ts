@@ -1,16 +1,22 @@
 import { ChatCompletionRole } from "groq-sdk/resources/chat/completions.mjs";
 import { create, devtools } from ".";
 
-type messages = {
+export type Attachments = [
+    {
+        type: "document" | "image" | "code";
+        code: string;
+    }
+];
+export type Message = {
     id: string;
     role: ChatCompletionRole;
     content: string;
-    attachments: null;
-}[];
+    attachments: Attachments | null;
+};
 
 interface MessagesStoreState {
-    messages: messages;
-    setMessages: (newMessages: messages) => void;
+    messages: Message[];
+    setMessages: (value: Message[] | ((prev: Message[]) => Message[])) => void;
 }
 
 export const useMessagesStore = create<MessagesStoreState>()(
@@ -38,7 +44,7 @@ export const useMessagesStore = create<MessagesStoreState>()(
                 id: "d3f6a0c8-3b27-4b3a-9db4-2f3e67d0914e",
                 role: "assistant",
                 content: "Sure! Could you please tell me your location?",
-                attachments: null,
+                attachments: true,
             },
             {
                 id: "b457f29b-6807-4d09-a3b6-df26a8b4cb76",
@@ -91,6 +97,10 @@ export const useMessagesStore = create<MessagesStoreState>()(
                 attachments: null,
             },
         ],
-        setMessages: (newMessages) => set({ messages: newMessages }),
+        setMessages: (newState) => {
+            return set((prevState) => ({
+                messages: typeof newState === "function" ? newState(prevState.messages) : newState,
+            }));
+        },
     }))
 );
