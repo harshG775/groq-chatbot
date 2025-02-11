@@ -1,4 +1,4 @@
-import { useMessagesStore, useStreamMessageStore } from "@/store/zustand";
+import { useMessagesStore, useStreamMessageStore, useUserPromptStore } from "@/store/zustand";
 import { groqClient } from ".";
 import { to } from "@/lib/utils/to";
 import { useRef } from "react";
@@ -21,6 +21,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
     const setIsLoading = useStreamMessageStore((state) => state.setIsLoading);
     const setIsError = useStreamMessageStore((state) => state.setIsError);
     const setError = useStreamMessageStore((state) => state.setError);
+    const setUserPrompt = useUserPromptStore((state) => state.setUserPrompt);
 
     const systemPrompt = `
     You are an expert React developer using Vite and Tailwind CSS. Your task is to generate React code based on user requests.
@@ -89,6 +90,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
             setStreamMessage(accumulated);
             setIsStreaming(false);
             setIsLoading(false);
+            setUserPrompt("")
         }
         if (error) {
             setIsError(true);

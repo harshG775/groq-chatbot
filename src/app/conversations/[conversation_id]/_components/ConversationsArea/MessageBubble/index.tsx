@@ -46,7 +46,7 @@ export function AssistantStreamMessageBubble() {
     if (error) {
         return (
             <div className={`mb-12 self-auto relative bottom-10`}>
-                <div className="bg-secondary/20 p-2 rounded-b-xl rounded-r-xl">
+                <div className="bg-destructive/20 p-2 rounded-b-xl rounded-r-xl">
                     {error && <div>{error?.message || "Something Went Wrong"}</div>}
                     {isLoading && <div>loading...</div>}
                 </div>

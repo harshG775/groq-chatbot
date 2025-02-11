@@ -2,22 +2,27 @@
 import { AutosizeTextarea } from "@/components/ui/AutosizeTextareaDemo";
 import { Button } from "@/components/ui/button";
 import useSolveQuery from "@/services/groq/useSolveQuery";
-import { useUserPromptStore } from "@/store/zustand";
+import { useStreamMessageStore, useUserPromptStore } from "@/store/zustand";
 import { Plus, SendHorizonal, Squircle } from "lucide-react";
 
 export default function InputBar() {
     const userPrompt = useUserPromptStore((state) => state.userPrompt);
     const setUserPrompt = useUserPromptStore((state) => state.setUserPrompt);
     const { handleSolveQuery, useAbortSolveQuery } = useSolveQuery({ userPrompt });
+    const isLoading = useStreamMessageStore((state) => state.isLoading);
 
     const handleSubmit = async () => {
+        if (isLoading) return;
         handleSolveQuery();
     };
     const handleOnKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
+            if (isLoading) return;
             handleSubmit();
         }
+        if (isLoading) return;
+
     };
     return (
         <div className="w-full px-2">
@@ -38,17 +43,27 @@ export default function InputBar() {
                             <Plus />
                         </Button>
                         <div>
-                            <Button size={"icon"} variant={"ghost"} className="rounded-full" onClick={handleSubmit}>
-                                <SendHorizonal />
-                            </Button>
-                            <Button
-                                size={"icon"}
-                                variant={"ghost"}
-                                className="rounded-full"
-                                onClick={useAbortSolveQuery}
-                            >
-                                <Squircle />
-                            </Button>
+                            {!isLoading ? (
+                                <Button
+                                    disabled={isLoading}
+                                    size={"icon"}
+                                    variant={"ghost"}
+                                    className="rounded-full"
+                                    onClick={handleSubmit}
+                                >
+                                    <SendHorizonal />
+                                </Button>
+                            ) : (
+                                <Button
+                                    disabled={!isLoading}
+                                    size={"icon"}
+                                    variant={"destructive"}
+                                    className="rounded-full"
+                                    onClick={useAbortSolveQuery}
+                                >
+                                    <Squircle />
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
