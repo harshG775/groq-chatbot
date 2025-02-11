@@ -3,15 +3,15 @@ import { AutosizeTextarea } from "@/components/ui/AutosizeTextareaDemo";
 import { Button } from "@/components/ui/button";
 import useSolveQuery from "@/services/groq/useSolveQuery";
 import { useUserPromptStore } from "@/store/zustand";
-import { Plus, SendHorizonal } from "lucide-react";
+import { Plus, SendHorizonal, Squircle } from "lucide-react";
 
 export default function InputBar() {
     const userPrompt = useUserPromptStore((state) => state.userPrompt);
     const setUserPrompt = useUserPromptStore((state) => state.setUserPrompt);
-    const { solveQuery } = useSolveQuery({ userPrompt });
+    const { handleSolveQuery, useAbortSolveQuery } = useSolveQuery({ userPrompt });
 
     const handleSubmit = async () => {
-        await solveQuery();
+        handleSolveQuery();
     };
     const handleOnKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -37,9 +37,19 @@ export default function InputBar() {
                         <Button size={"icon"} variant={"ghost"} className="rounded-full">
                             <Plus />
                         </Button>
-                        <Button size={"icon"} variant={"ghost"} className="rounded-full">
-                            <SendHorizonal onClick={handleSubmit} />
-                        </Button>
+                        <div>
+                            <Button size={"icon"} variant={"ghost"} className="rounded-full" onClick={handleSubmit}>
+                                <SendHorizonal />
+                            </Button>
+                            <Button
+                                size={"icon"}
+                                variant={"ghost"}
+                                className="rounded-full"
+                                onClick={useAbortSolveQuery}
+                            >
+                                <Squircle />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>

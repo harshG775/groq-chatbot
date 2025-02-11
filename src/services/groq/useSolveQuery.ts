@@ -1,14 +1,19 @@
 import { useMessagesStore, useStreamMessageStore } from "@/store/zustand";
 import { groqClient } from ".";
 import { to } from "@/lib/utils/to";
+import { useRef } from "react";
 
 const delay = async (ms: number): Promise<void> => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
-    solveQuery: () => void;
+    handleSolveQuery: () => void;
+    useAbortSolveQuery: () => void;
 } {
+    let accumulated = "";
+
+    const abortControllerRef = useRef<AbortController | null>(null);
     // const streamMessage = useStreamMessageStore((state)=>state.streamMessage)
     const setStreamMessage = useStreamMessageStore((state) => state.setStreamMessage);
     const setMessages = useMessagesStore((state) => state.setMessages);
@@ -32,7 +37,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
     
     `;
 
-    const solveQuery = async () => {
+    const handleSolveQuery = async () => {
         const newUserMessageId = crypto.randomUUID();
         setMessages((prev) => [
             ...prev,
@@ -44,51 +49,69 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
             },
         ]);
         setIsLoading(true);
+        setError(null);
+        abortControllerRef.current = new AbortController();
         const [error, stream] = await to(
-            groqClient.chat.completions.create({
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userPrompt },
-                ],
-                model: "deepseek-r1-distill-llama-70b",
-                stream: true,
-            })
-        );
-        if (error) {
-            setIsError(true);
-            setError(error);
-            //
-            setIsStreaming(false);
-            setIsLoading(false);
-        }
-        if (stream) {
-            let accumulated = "";
-            for await (const chunk of stream) {
-                // stop
-                if (chunk.choices[0].finish_reason === "stop") {
-                    const newAssistantMessageId = crypto.randomUUID();
-                    setMessages((prev) => [
-                        ...prev,
-                        {
-                            id: newAssistantMessageId,
-                            role: "assistant",
-                            content: accumulated,
-                            attachments: null,
-                        },
-                    ]);
-                    accumulated = "";
-                    setStreamMessage(accumulated);
-                    setIsStreaming(false);
-                    setIsLoading(false);
-                    return;
+            groqClient.chat.completions.create(
+                {
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: userPrompt },
+                    ],
+                    model: "deepseek-r1-distill-llama-70b",
+                    stream: true,
+                },
+                {
+                    signal: abortControllerRef.current.signal,
                 }
-                // start
+            )
+        );
+        if (stream) {
+            for await (const chunk of stream) {
+                // stream start
                 setStreamMessage(accumulated);
                 setIsStreaming(true);
                 accumulated += chunk?.choices?.[0]?.delta?.content || "";
                 await delay(20);
             }
+            // stream end
+            const newAssistantMessageId = crypto.randomUUID();
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: newAssistantMessageId,
+                    role: "assistant",
+                    content: accumulated,
+                    attachments: null,
+                },
+            ]);
+            accumulated = "";
+            setStreamMessage(accumulated);
+            setIsStreaming(false);
+            setIsLoading(false);
+        }
+        if (error) {
+            setIsError(true);
+            setError(error);
+            accumulated = "";
+            //
+            const newAssistantMessageId = crypto.randomUUID();
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: newAssistantMessageId,
+                    role: "assistant",
+                    content: accumulated,
+                    attachments: null,
+                },
+            ]);
+            setStreamMessage(accumulated);
+            setIsStreaming(false);
+            setIsLoading(false);
         }
     };
-    return { solveQuery };
+    const useAbortSolveQuery = async () => {
+        abortControllerRef.current?.abort();
+    };
+    return { handleSolveQuery, useAbortSolveQuery };
 }

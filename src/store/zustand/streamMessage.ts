@@ -5,12 +5,12 @@ interface StreamMessageStoreState {
     isError: boolean;
     streamMessage: string;
     isStreaming: boolean;
-    error: Error;
+    error: Error | null;
     setStreamMessage: (value: string | ((prev: string) => string)) => void;
     setIsStreaming: (value: boolean) => void;
     setIsLoading: (value: boolean) => void;
     setIsError: (value: boolean) => void;
-    setError: (value: Error) => void;
+    setError: (value: Error | null) => void;
 }
 
 export const useStreamMessageStore = create<StreamMessageStoreState>()(

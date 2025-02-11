@@ -39,7 +39,16 @@ export function AssistantStreamMessageBubble() {
                 <div className="bg-secondary/20 p-2 rounded-b-xl rounded-r-xl">
                     {isStreaming && <Markdown>{streamMessage}</Markdown>}
                     {isLoading && <div>loading...</div>}
-                    {error && <div>{JSON.stringify(error)}</div>}
+                </div>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className={`mb-12 self-auto relative bottom-10`}>
+                <div className="bg-secondary/20 p-2 rounded-b-xl rounded-r-xl">
+                    {error && <div>{error?.message || "Something Went Wrong"}</div>}
+                    {isLoading && <div>loading...</div>}
                 </div>
             </div>
         );
