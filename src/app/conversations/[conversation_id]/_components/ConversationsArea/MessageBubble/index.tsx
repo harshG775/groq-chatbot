@@ -24,10 +24,10 @@ export function AssistantMessageBubble({ message }: { message: Message }) {
 }
 export function AssistantStreamMessageBubble() {
     const streamMessage = useStreamMessageStore((state) => state.streamMessage);
-    if (!streamMessage.streaming) {
-        return null;
-    }
-    if (streamMessage.streaming) {
+    const isStreaming = useStreamMessageStore((state) => state.isStreaming);
+    const isLoading = useStreamMessageStore((state) => state.isLoading);
+    const error = useStreamMessageStore((state) => state.error);
+    if (isLoading) {
         return (
             <>
                 <div>
@@ -36,7 +36,9 @@ export function AssistantStreamMessageBubble() {
                     </div>
                 </div>
                 <div className="bg-secondary/20 p-2 rounded-b-xl rounded-r-xl">
-                    <div>{streamMessage.content}</div>
+                    <div>{isStreaming && streamMessage}</div>
+                    <div>{isLoading && "loading..."}</div>
+                    <div>{error && JSON.stringify(error)}</div>
                 </div>
             </>
         );

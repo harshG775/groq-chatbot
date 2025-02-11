@@ -1,5 +1,6 @@
 import { useMessagesStore, useStreamMessageStore } from "@/store/zustand";
 import { groqClient } from ".";
+import { to } from "@/lib/utils/to";
 
 export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
     solveQuery: () => void;
@@ -7,6 +8,11 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
     // const streamMessage = useStreamMessageStore((state)=>state.streamMessage)
     const setStreamMessage = useStreamMessageStore((state) => state.setStreamMessage);
     const setMessages = useMessagesStore((state) => state.setMessages);
+    const setIsStreaming = useStreamMessageStore((state) => state.setIsStreaming);
+    const setIsLoading = useStreamMessageStore((state) => state.setIsLoading);
+    const setIsError = useStreamMessageStore((state) => state.setIsError);
+    const setError = useStreamMessageStore((state) => state.setError);
+
     const systemPrompt = `
     You are an expert React developer using Vite and Tailwind CSS. Your task is to generate React code based on user requests.
     
@@ -33,42 +39,50 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
                 attachments: null,
             },
         ]);
-
-        const stream = await groqClient.chat.completions.create({
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt },
-            ],
-            model: "deepseek-r1-distill-llama-70b",
-            stream: true,
-        });
-        let accumulated = "";
-        for await (const chunk of stream) {
-            // stop
-            if (chunk.choices[0].finish_reason === "stop") {
-                const newAssistantMessageId = crypto.randomUUID();
-                setMessages((prev) => [
-                    ...prev,
-                    {
-                        id: newAssistantMessageId,
-                        role: "assistant",
-                        content: accumulated,
-                        attachments: null,
-                    },
-                ]);
-                accumulated = "";
-                setStreamMessage({
-                    content: accumulated,
-                    streaming: false,
-                });
-                return;
+        setIsLoading(true);
+        const [error, stream] = await to(
+            groqClient.chat.completions.create({
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userPrompt },
+                ],
+                model: "deepseek-r1-distill-llama-70b",
+                stream: true,
+            })
+        );
+        if (error) {
+            setIsError(true);
+            setError(error);
+            // 
+            setIsStreaming(false);
+            setIsLoading(false);
+        }
+        if (stream) {
+            let accumulated = "";
+            for await (const chunk of stream) {
+                // stop
+                if (chunk.choices[0].finish_reason === "stop") {
+                    const newAssistantMessageId = crypto.randomUUID();
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: newAssistantMessageId,
+                            role: "assistant",
+                            content: accumulated,
+                            attachments: null,
+                        },
+                    ]);
+                    accumulated = "";
+                    setStreamMessage(accumulated);
+                    setIsStreaming(false);
+                    setIsLoading(false);
+                    return;
+                }
+                // start
+                setStreamMessage(accumulated);
+                setIsStreaming(true);
+                accumulated += chunk?.choices?.[0]?.delta?.content || "";
             }
-            // start
-            setStreamMessage({
-                content: accumulated,
-                streaming: true,
-            });
-            accumulated += chunk?.choices?.[0]?.delta?.content || "";
         }
     };
     return { solveQuery };
