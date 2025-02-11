@@ -2,6 +2,10 @@ import { useMessagesStore, useStreamMessageStore } from "@/store/zustand";
 import { groqClient } from ".";
 import { to } from "@/lib/utils/to";
 
+const delay = async (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
     solveQuery: () => void;
 } {
@@ -53,7 +57,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
         if (error) {
             setIsError(true);
             setError(error);
-            // 
+            //
             setIsStreaming(false);
             setIsLoading(false);
         }
@@ -82,6 +86,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
                 setStreamMessage(accumulated);
                 setIsStreaming(true);
                 accumulated += chunk?.choices?.[0]?.delta?.content || "";
+                await delay(20);
             }
         }
     };
