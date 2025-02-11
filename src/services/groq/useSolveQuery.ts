@@ -61,6 +61,7 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
                     content: accumulated,
                     streaming: false,
                 });
+                return;
             }
             // start
             setStreamMessage({
