@@ -30,7 +30,7 @@ export function AssistantStreamMessageBubble() {
     const error = useStreamMessageStore((state) => state.error);
     if (isLoading) {
         return (
-            <>
+            <div className={`mb-12 self-auto`}>
                 <div>
                     <div className="w-10 h-10 grid place-content-center bg-secondary/20  rounded-t-full">
                         <Bot />
@@ -41,7 +41,7 @@ export function AssistantStreamMessageBubble() {
                     {isLoading && <div>loading...</div>}
                     {error && <div>{JSON.stringify(error)}</div>}
                 </div>
-            </>
+            </div>
         );
     }
 }

@@ -11,7 +11,7 @@ function CurrentMessageDiv() {
             currentMessageRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
-    return <div ref={currentMessageRef} className="h-16"/>;
+    return <div ref={currentMessageRef}/>;
 }
 
 export default function ConversationsArea() {
