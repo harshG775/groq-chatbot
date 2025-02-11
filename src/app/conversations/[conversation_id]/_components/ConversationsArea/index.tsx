@@ -11,7 +11,7 @@ function CurrentMessageDiv() {
             currentMessageRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
-    return <div ref={currentMessageRef} />;
+    return <div ref={currentMessageRef} className="h-16"/>;
 }
 
 export default function ConversationsArea() {
@@ -19,16 +19,16 @@ export default function ConversationsArea() {
     // const setMessages = useMessagesStore((state) => state.setMessages);
 
     return (
-        <main className="overflow-auto scrollbar-color">
+        <main className="overflow-auto scrollbar-color flex-1">
             <div className="max-w-6xl mx-auto flex flex-col">
                 {messages?.map((message) => (
                     <div key={message?.id} className={`mb-12 ${message?.role === "user" ? "self-end" : "self-auto"}`}>
                         {message?.role === "user" && <UserMessageBubble message={message} />}
                         {message?.role === "assistant" && <AssistantMessageBubble message={message} />}
-                        <CurrentMessageDiv />
                     </div>
                 ))}
                 <AssistantStreamMessageBubble/>
+                <CurrentMessageDiv />
             </div>
         </main>
     );
