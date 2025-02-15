@@ -7,11 +7,16 @@ type Classification = {
     error: string;
 };
 
-export async function queryClassifier(
-    userPrompt: string,
-    messagesContext?: ChatCompletionUserMessageParam[],
-    signal?: AbortSignal | null | undefined
-): Promise<Classification | undefined> {
+type queryClassifierParams = {
+    userPrompt: string;
+    messagesContext?: ChatCompletionUserMessageParam[];
+    signal?: AbortSignal | null | undefined;
+};
+export async function queryClassifier({
+    userPrompt,
+    messagesContext,
+    signal,
+}: queryClassifierParams): Promise<Classification | undefined> {
     const MODEL = "deepseek-r1-distill-llama-70b";
 
     const tools: ChatCompletionTool[] | null | undefined = [

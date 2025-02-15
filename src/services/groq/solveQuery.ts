@@ -8,7 +8,7 @@ type SolveQueryParams = {
     signal?: AbortSignal | null | undefined;
 };
 export const solveQuery = async ({ userPrompt, signal }: SolveQueryParams): Promise<Stream<ChatCompletionChunk>> => {
-    const classification = await queryClassifier(userPrompt, [], signal);
+    const classification = await queryClassifier({ userPrompt: userPrompt, messagesContext: [], signal });
 
     if (classification?.classification === "programming") {
         return groqClient.chat.completions.create(
