@@ -6,7 +6,7 @@ type CodeBlockProps = {
     className?: string;
     code: string;
     language?: BundledLanguage | SpecialLanguage;
-    theme?: "light-plus" | "one-dark-pro";
+    theme: "light-plus" | "one-dark-pro";
     disableCopy?: boolean;
 };
 
@@ -14,21 +14,19 @@ export default function CodeBlock({
     className,
     code,
     language = "plaintext",
-    theme = "one-dark-pro",
+    theme,
     disableCopy = false,
 }: CodeBlockProps) {
     const [htmlContent, setHtmlContent] = useState<string>("");
     const [copied, setCopied] = useState(false);
-
     useEffect(() => {
+        // Verify if the language is supported
+        if (language && !isSpecialLang(language) && !(language in bundledLanguages)) {
+            console.warn(`Language ${language} is not supported, falling back to plaintext`);
+            // language = "plaintext";
+        }
         const highlightCode = async () => {
             try {
-                // Verify if the language is supported
-                if (language && !isSpecialLang(language) && !(language in bundledLanguages)) {
-                    console.warn(`Language ${language} is not supported, falling back to plaintext`);
-                    language = "plaintext";
-                }
-
                 const html = await codeToHtml(code, {
                     lang: language,
                     theme: theme,
@@ -58,9 +56,7 @@ export default function CodeBlock({
         <div className={`relative group mt-10 bg-secondary/20 rounded-md ${className || ""}`}>
             {!disableCopy && language != "plaintext" && (
                 <>
-                    <div className="absolute top-0 px-4 h-11 rounded-t-md w-full flex items-center">
-                        {language}
-                    </div>
+                    <div className="absolute top-0 px-4 h-11 rounded-t-md w-full flex items-center">{language}</div>
                     <div className="sticky top-0  py-1 pr-1 flex justify-end">
                         <Button variant={"secondary"} onClick={handleCopy} aria-label="Copy code">
                             {copied ? "Copied!" : "Copy"}

@@ -11,12 +11,14 @@ import { PropsWithChildren, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import CodeBlock from "@/components/syntax-highlighter/shiki";
 import { BundledLanguage } from "shiki";
+import { useTheme } from "next-themes";
 
 export default function Markdown({
     children,
     className,
     ...props
 }: PropsWithChildren<{ children: string; className?: string }>) {
+    const { theme: mode } = useTheme();
     const components = useMemo(() => {
         return {
             img: ({ ...props }) => <img {...props} className="max-w-full h-auto my-4 rounded p-10" />,
@@ -35,6 +37,7 @@ export default function Markdown({
                         <CodeBlock
                             code={firstChild.children[0].value}
                             language={language as BundledLanguage}
+                            theme={mode === "dark" ? "one-dark-pro" : "light-plus"}
                             {...rest}
                         />
                     );
@@ -42,7 +45,7 @@ export default function Markdown({
                 return <pre {...rest}>{children}</pre>;
             },
         } as Components;
-    }, []);
+    }, [mode]);
     return (
         <ReactMarkdown
             {...props}
