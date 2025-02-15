@@ -70,19 +70,20 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
             )
         );
         if (stream) {
+            setUserPrompt("")
             for await (const chunk of stream) {
                 // stream start
                 setStreamMessage(accumulated);
                 setIsStreaming(true);
                 const content = chunk?.choices?.[0]?.delta?.content || "";
                 if (content.includes("<think>")) {
-                    accumulated += ">   \n";
+                    accumulated += "<details><summary>Think</summary>";
                     isThinking = true;
                     continue; // Skip the "<think>" tag itself
                 }
                 if (content.includes("</think>")) {
                     isThinking = false;
-                    accumulated += "\n>   ";
+                    accumulated += "</details>\n\n";
                     continue; // Skip the "</think>" tag itself
                 }
                 accumulated += content;
@@ -103,7 +104,6 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
             setStreamMessage(accumulated);
             setIsStreaming(false);
             setIsLoading(false);
-            setUserPrompt("")
         }
         if (error) {
             setIsError(true);
