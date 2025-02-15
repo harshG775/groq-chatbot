@@ -11,7 +11,7 @@ function CurrentMessageDiv() {
             currentMessageRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
-    return <div ref={currentMessageRef}/>;
+    return <div ref={currentMessageRef} />;
 }
 
 export default function ConversationsArea() {
@@ -21,13 +21,16 @@ export default function ConversationsArea() {
     return (
         <main className="overflow-auto scrollbar-color flex-1">
             <div className="max-w-6xl mx-auto flex flex-col">
+                {messages?.length < 1 && 
+                <div className="grid place-content-center  min-h-[calc(100dvh_-_11.5rem)]">Bot</div>
+                }
                 {messages?.map((message) => (
                     <div key={message?.id} className={`mb-12 ${message?.role === "user" ? "self-end" : "self-auto"}`}>
                         {message?.role === "user" && <UserMessageBubble message={message} />}
                         {message?.role === "assistant" && <AssistantMessageBubble message={message} />}
                     </div>
                 ))}
-                <AssistantStreamMessageBubble/>
+                <AssistantStreamMessageBubble />
                 <CurrentMessageDiv />
             </div>
         </main>
