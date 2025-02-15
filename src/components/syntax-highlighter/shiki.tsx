@@ -44,6 +44,9 @@ export default function CodeBlock({
 
     const handleCopy = async () => {
         try {
+            if (copied) {
+                return;
+            }
             await navigator.clipboard.writeText(code);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
