@@ -12,6 +12,8 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
     useAbortSolveQuery: () => void;
 } {
     let accumulated = "";
+    let isThinking = false;
+
 
     const abortControllerRef = useRef<AbortController | null>(null);
     // const streamMessage = useStreamMessageStore((state)=>state.streamMessage)
@@ -72,7 +74,18 @@ export default function useSolveQuery({ userPrompt }: { userPrompt: string }): {
                 // stream start
                 setStreamMessage(accumulated);
                 setIsStreaming(true);
-                accumulated += chunk?.choices?.[0]?.delta?.content || "";
+                const content = chunk?.choices?.[0]?.delta?.content || "";
+                if (content.includes("<think>")) {
+                    accumulated += ">   \n";
+                    isThinking = true;
+                    continue; // Skip the "<think>" tag itself
+                }
+                if (content.includes("</think>")) {
+                    isThinking = false;
+                    accumulated += "\n>   ";
+                    continue; // Skip the "</think>" tag itself
+                }
+                accumulated += content;
                 await delay(20);
             }
             // stream end

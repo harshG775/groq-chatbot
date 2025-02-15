@@ -3,11 +3,7 @@ import { Message, useStreamMessageStore } from "@/store/zustand";
 import { Bot } from "lucide-react";
 
 export function UserMessageBubble({ message }: { message: Message }) {
-    return (
-        <div className="bg-primary/20    max-w-max p-2 rounded-xl">
-            <Markdown>{message.content}</Markdown>
-        </div>
-    );
+    return <div className={"bg-primary/20 p-2 rounded-xl max-w-max"}>{message.content}</div>;
 }
 export function AssistantMessageBubble({ message }: { message: Message }) {
     return (
@@ -17,8 +13,8 @@ export function AssistantMessageBubble({ message }: { message: Message }) {
                     <Bot />
                 </div>
             </div>
-            <div className="bg-secondary/20 p-2 rounded-b-xl rounded-r-xl">
-                <Markdown>{message.content}</Markdown>
+            <div className="bg-secondary/20 rounded-b-xl rounded-r-xl">
+                <Markdown className={"p-2 w-full max-w-max"}>{message.content}</Markdown>
             </div>
         </>
     );
@@ -36,8 +32,8 @@ export function AssistantStreamMessageBubble() {
                         <Bot />
                     </div>
                 </div>
-                <div className="bg-secondary/20 p-2 rounded-b-xl rounded-r-xl">
-                    {isStreaming && <Markdown>{streamMessage}</Markdown>}
+                <div className="bg-secondary/20 rounded-b-xl rounded-r-xl">
+                    {isStreaming && <Markdown className={"p-2 w-full max-w-max"}>{streamMessage}</Markdown>}
                     {isLoading && <div>loading...</div>}
                 </div>
             </div>
