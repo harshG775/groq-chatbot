@@ -75,6 +75,7 @@ export async function queryClassifier({
                 tools: tools,
                 tool_choice: "auto",
                 max_completion_tokens: 4096,
+                temperature: 0,
             },
             {
                 signal,
