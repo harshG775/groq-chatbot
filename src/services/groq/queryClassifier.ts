@@ -3,13 +3,14 @@ import { groqClient } from ".";
 import { to } from "@/lib/utils/to";
 
 type Classification = {
-    classification: "programming" | "none-programming" | "ambiguous" | "error";
+    classification: "programming" | "non-programming" | "ambiguous" | "error";
     error: string;
 };
 
 export async function queryClassifier(
     userPrompt: string,
-    messagesContext?: ChatCompletionUserMessageParam[]
+    messagesContext?: ChatCompletionUserMessageParam[],
+    signal?: AbortSignal | null | undefined
 ): Promise<Classification | undefined> {
     const MODEL = "deepseek-r1-distill-llama-70b";
 
@@ -18,13 +19,13 @@ export async function queryClassifier(
             type: "function",
             function: {
                 name: "classify_query",
-                description: "Classify the query as 'programming', 'none-programming', or 'ambiguous'.",
+                description: "Classify the query as 'programming', 'non-programming', or 'ambiguous'.",
                 parameters: {
                     type: "object",
                     properties: {
                         classification: {
                             type: "string",
-                            enum: ["programming", "none-programming", "ambiguous"],
+                            enum: ["programming", "non-programming", "ambiguous"],
                             description: "The classification of the user query.",
                         },
                     },
@@ -34,7 +35,7 @@ export async function queryClassifier(
         },
     ];
     const systemPrompt = `
-            Classify the user query into one of the following categories: 'programming', 'none-programming', or 'ambiguous'.
+            Classify the user query into one of the following categories: 'programming', 'non-programming', or 'ambiguous'.
 
             *programming*: Queries related to coding, software development, algorithms, programming languages, debugging, or technical issues.
                 Examples:
@@ -42,7 +43,7 @@ export async function queryClassifier(
                 - "What is the difference between 'let' and 'var' in JavaScript?"
                 - "How can I optimize my SQL queries?"
 
-            *none-programming*: Queries that are not related to programming or technical topics. These can include everyday questions, none-programming knowledge, or non-technical advice.
+            *non-programming*: Queries that are not related to programming or technical topics. These can include everyday questions, non-programming knowledge, or non-technical advice.
                 Examples:
                 - "What is the capital of France?"
                 - "How do I bake a chocolate cake?"
@@ -57,18 +58,23 @@ export async function queryClassifier(
             Based on the user's query, classify it into one of the above categories.
             `;
     const [error, response] = await to(
-        groqClient.chat.completions.create({
-            model: MODEL,
-            messages: [
-                { role: "system", content: systemPrompt },
-                ...(messagesContext || []),
-                { role: "user", content: userPrompt },
-            ],
-            stream: false,
-            tools: tools,
-            tool_choice: "auto",
-            max_completion_tokens: 4096,
-        })
+        groqClient.chat.completions.create(
+            {
+                model: MODEL,
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    ...(messagesContext || []),
+                    { role: "user", content: userPrompt },
+                ],
+                stream: false,
+                tools: tools,
+                tool_choice: "auto",
+                max_completion_tokens: 4096,
+            },
+            {
+                signal,
+            }
+        )
     );
     if (response) {
         const responseMessage = response.choices[0].message;
