@@ -285,7 +285,7 @@ It converts "HTML", but keep intact partial entries like "xxxHTMLyyy" and so on.
 
 
             `)
-    })
+    },[])
     return (
             <Markdown className={"w-[calc(100%_-_2rem)] mx-auto"}>{content}</Markdown>
     );

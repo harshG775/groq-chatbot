@@ -1,6 +1,4 @@
-import { to } from "@/lib/utils/to";
 import { groqClient } from "@/services/groq";
-import { queryClassifier } from "@/services/groq/queryClassifier";
 
 export async function POST(request: Request) {
     const { message, messages } = await request.json();
@@ -40,8 +38,9 @@ export async function POST(request: Request) {
 
                     controller.enqueue(encoder.encode(`event: message\ndata: ${text}\n\n`));
                 }
-            } catch (error: any) {
-                controller.enqueue(encoder.encode(`event: error\ndata: [ERROR] ${error?.message}\n\n`));
+            } catch (error) {
+                console.log(error);
+                controller.enqueue(encoder.encode(`event: error\ndata: [ERROR] ${"error?.message"}\n\n`));
             } finally {
                 controller.close();
             }

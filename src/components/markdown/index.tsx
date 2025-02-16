@@ -21,7 +21,7 @@ export default function Markdown({
     const { theme: mode } = useTheme();
     const components = useMemo(() => {
         return {
-            img: ({ ...props }) => <img {...props} className="max-w-full h-auto my-4 rounded p-10" />,
+            // img: ({ ...props }) => <img {...props} className="max-w-full h-auto my-4 rounded p-10" />,
             pre: ({ children, node, ...rest }) => {
                 const [firstChild] = node?.children ?? [];
                 if (
