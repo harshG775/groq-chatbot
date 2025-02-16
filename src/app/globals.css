@@ -80,15 +80,15 @@ body {
 }
 
 .scrollbar-color {
-    scrollbar-color: hsla(var(--foreground)/0.4) hsl(var(--background));
-    /* scrollbar-gutter: stable both-edges; */
-    padding: 0 0.6rem 0 1.6rem;
+    scrollbar-color: hsla(var(--foreground) / 0.4) hsl(var(--background));
+    scrollbar-gutter: stable both-edges;
+    padding: 0 0.55rem;
 }
 .scrollbar-color:hover {
-    scrollbar-color: hsla(var(--foreground)/0.8) hsl(var(--background));
+    scrollbar-color: hsla(var(--foreground) / 0.8) hsl(var(--background));
 }
-/* @supports not (scrollbar-gutter: stable both-edges) {
+@supports not (scrollbar-gutter: stable both-edges) {
     .scrollbar-color {
         padding: 0 0.6rem 0 1.6rem;
     }
-} */
+}
