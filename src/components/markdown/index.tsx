@@ -19,8 +19,6 @@ export default function Markdown({
     ...props
 }: PropsWithChildren<{ children: string; className?: string }>) {
     const { theme: mode } = useTheme();
-    console.log(mode);
-
     const components = useMemo(() => {
         return {
             // img: ({ ...props }) => <img {...props} className="max-w-full h-auto my-4 rounded p-10" />,
