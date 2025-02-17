@@ -19,6 +19,8 @@ export default function Markdown({
     ...props
 }: PropsWithChildren<{ children: string; className?: string }>) {
     const { theme: mode } = useTheme();
+    console.log(mode);
+
     const components = useMemo(() => {
         return {
             // img: ({ ...props }) => <img {...props} className="max-w-full h-auto my-4 rounded p-10" />,
@@ -37,7 +39,7 @@ export default function Markdown({
                         <CodeBlock
                             code={firstChild.children[0].value}
                             language={language as BundledLanguage}
-                            theme={mode === "dark" ? "one-dark-pro" : "light-plus"}
+                            theme={mode === "system" ? "one-dark-pro" : mode === "dark" ? "one-dark-pro" : "light-plus"}
                             {...rest}
                         />
                     );
