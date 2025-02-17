@@ -1,12 +1,16 @@
 import { ChatCompletionRole } from "groq-sdk/resources/chat/completions.mjs";
 import { create, persist, devtools } from ".";
 
-export type Attachments = [
-    {
-        type: "document" | "image" | "code";
-        code: string;
-    }
-];
+export type Attachments = {
+    type: "document" | "image" | "code";
+    code?: {
+        files: {
+            [filename: string]: {
+                code: string;
+            };
+        };
+    };
+};
 export type Message = {
     id: string;
     role: ChatCompletionRole;
