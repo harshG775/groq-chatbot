@@ -87,8 +87,14 @@ body {
 .scrollbar-color:hover {
     scrollbar-color: hsla(var(--foreground) / 0.8) hsl(var(--background));
 }
-@supports not (scrollbar-gutter: stable ) {
+@supports not (scrollbar-gutter: stable) {
     .scrollbar-color {
         padding: 0 0.6rem 0 1.6rem;
     }
+}
+
+/* scrollbar-w-thin */
+.scrollbar-w-thin,
+.scrollbar-w-thin * {
+    scrollbar-width: thin;
 }
