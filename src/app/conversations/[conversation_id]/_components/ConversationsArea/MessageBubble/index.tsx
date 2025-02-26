@@ -1,3 +1,4 @@
+import { LoadingSnail } from "@/app/loading";
 import Markdown from "@/components/markdown";
 import { Message, useStreamMessageStore } from "@/store/zustand";
 import { Bot } from "lucide-react";
@@ -31,8 +32,16 @@ export function AssistantStreamMessageBubble() {
                     </div>
                 </div>
                 <div className="bg-secondary/20 rounded-b-xl rounded-r-xl">
-                    {isStreaming && <Markdown className={"p-2 max-w-7xl bg-secondary/20 rounded-b-xl rounded-r-xl"}>{streamMessage}</Markdown>}
-                    {isLoading && <div>loading...</div>}
+                    {isStreaming && (
+                        <Markdown className={"p-2 max-w-7xl bg-secondary/20 rounded-b-xl rounded-r-xl"}>
+                            {streamMessage}
+                        </Markdown>
+                    )}
+                    {isLoading && (
+                        <div className="pl-4 pt-4">
+                            <LoadingSnail />
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -42,7 +51,11 @@ export function AssistantStreamMessageBubble() {
             <div className={`mb-12 self-auto relative bottom-10`}>
                 <div className="bg-destructive/20 p-2 rounded-b-xl rounded-r-xl">
                     {error && <div>{error?.message || "Something Went Wrong"}</div>}
-                    {isLoading && <div>loading...</div>}
+                    {isLoading && (
+                        <div className="pl-4 pt-4">
+                            <LoadingSnail />
+                        </div>
+                    )}
                 </div>
             </div>
         );

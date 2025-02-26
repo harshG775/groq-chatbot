@@ -1,3 +1,5 @@
+import { SnailIcon } from "lucide-react";
+
 export function PageLoadingBasic() {
     return (
         <div className=" flex space-x-2 justify-center items-center">
@@ -31,6 +33,16 @@ export default function loading() {
     return (
         <div className="fixed inset-0 grid place-content-center bg-background">
             <PageLoadingBounceSpin />
+        </div>
+    );
+}
+
+export function LoadingSnail() {
+    return (
+        <div className="animate-pulse">
+            <div className="animate-bounce inline-block">
+                <SnailIcon className="animate-spin text-primary" />
+            </div>
         </div>
     );
 }
