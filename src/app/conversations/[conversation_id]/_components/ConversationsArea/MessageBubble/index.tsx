@@ -13,9 +13,7 @@ export function AssistantMessageBubble({ message }: { message: Message }) {
                     <Bot />
                 </div>
             </div>
-            <div className="bg-secondary/20 rounded-b-xl rounded-r-xl">
-                <Markdown className={"p-2 w-full max-w-max"}>{message.content}</Markdown>
-            </div>
+            <Markdown className={"p-2 max-w-7xl bg-secondary/20 rounded-b-xl rounded-r-xl"}>{message.content}</Markdown>
         </>
     );
 }
@@ -33,7 +31,7 @@ export function AssistantStreamMessageBubble() {
                     </div>
                 </div>
                 <div className="bg-secondary/20 rounded-b-xl rounded-r-xl">
-                    {isStreaming && <Markdown className={"p-2 w-full max-w-max"}>{streamMessage}</Markdown>}
+                    {isStreaming && <Markdown className={"p-2 max-w-7xl bg-secondary/20 rounded-b-xl rounded-r-xl"}>{streamMessage}</Markdown>}
                     {isLoading && <div>loading...</div>}
                 </div>
             </div>
