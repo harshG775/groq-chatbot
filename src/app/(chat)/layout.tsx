@@ -3,7 +3,7 @@ import React, { PropsWithChildren } from "react";
 
 export default function ChatLayout({ children }: PropsWithChildren) {
     return (
-        <div>
+        <div className="flex flex-col h-screen">
             <Header />
             {children}
         </div>
